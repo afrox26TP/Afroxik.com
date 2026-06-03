@@ -2,7 +2,6 @@ import { useEffect, useState } from 'react'
 import { getPageData } from './lib/content'
 import ProjectCard from './components/ProjectCard'
 import ThemeToggle from './components/ThemeToggle'
-import LiquidGlass from './components/ui/liquid-glass'
 import './index.css'
 
 export default function App() {
@@ -46,28 +45,17 @@ export default function App() {
 
       {/* Hero / Intro Section */}
       <section className="max-w-6xl mx-auto px-4 py-16 sm:px-6 lg:px-8">
-        <LiquidGlass
-          borderRadius={18}
-          saturation={1.18}
-          displace={0.42}
-          className="p-8"
-        >
+        <div className="p-8 rounded-2xl bg-white/60 dark:bg-gray-900/60 border border-gray-200 dark:border-gray-700">
           <p className="text-sm font-semibold text-blue-600 dark:text-blue-400 uppercase tracking-wider mb-2">
             {profile.role}
           </p>
           <p className="text-lg text-gray-700 dark:text-gray-300 max-w-2xl">{profile.intro}</p>
-        </LiquidGlass>
+        </div>
       </section>
 
       {/* Projects Section */}
       <section id="projects" className="max-w-6xl mx-auto px-4 py-12 sm:px-6 lg:px-8">
-        <LiquidGlass
-          as="div"
-          borderRadius={14}
-          saturation={1.18}
-          displace={0.42}
-          className="p-8"
-        >
+        <div className="p-8 rounded-xl bg-white/60 dark:bg-gray-900/60 border border-gray-200 dark:border-gray-700">
           <div className="flex items-center justify-between mb-8">
             <h2 className="text-3xl font-bold text-gray-900 dark:text-white">Projects</h2>
             <span className="text-sm font-medium text-gray-500 dark:text-gray-400 bg-gray-100 dark:bg-gray-800 px-3 py-1 rounded-full">
@@ -80,19 +68,13 @@ export default function App() {
               <ProjectCard key={project.id} project={project} />
             ))}
           </div>
-        </LiquidGlass>
+        </div>
       </section>
 
       {/* Contact / Social Footer */}
       <footer className="bg-white dark:bg-gray-900 border-t border-gray-200 dark:border-gray-800 mt-16">
         <div className="max-w-6xl mx-auto px-4 py-12 sm:px-6 lg:px-8">
-          <LiquidGlass
-            as="div"
-            borderRadius={14}
-            saturation={1.18}
-            displace={0.42}
-            className="p-8"
-          >
+          <div className="p-8 rounded-xl bg-white/60 dark:bg-gray-900/60 border border-gray-200 dark:border-gray-700">
             <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-8">Get in touch</h2>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
               {profile.discord && (
@@ -141,7 +123,7 @@ export default function App() {
                 </a>
               )}
             </div>
-          </LiquidGlass>
+          </div>
         </div>
       </footer>
     </div>
