@@ -1,0 +1,30 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="675" viewBox="0 0 1200 675" role="img" aria-label="Octopus AI preview">
+  <defs>
+    <radialGradient id="bg" cx="50%" cy="45%" r="70%">
+      <stop offset="0%" stop-color="#132e56"/>
+      <stop offset="100%" stop-color="#060d1d"/>
+    </radialGradient>
+    <linearGradient id="head" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#98f0ff"/>
+      <stop offset="100%" stop-color="#4b8bff"/>
+    </linearGradient>
+  </defs>
+  <rect width="1200" height="675" fill="url(#bg)"/>
+  <circle cx="600" cy="285" r="140" fill="url(#head)"/>
+  <g fill="none" stroke="#7cecff" stroke-width="16" stroke-linecap="round" opacity="0.85">
+    <path d="M470 360 C360 430 320 510 360 610"/>
+    <path d="M530 380 C440 460 430 535 470 620"/>
+    <path d="M600 390 C560 470 560 545 600 620"/>
+    <path d="M670 380 C760 460 770 535 730 620"/>
+    <path d="M730 360 C840 430 880 510 840 610"/>
+  </g>
+  <circle cx="555" cy="270" r="18" fill="#031022"/>
+  <circle cx="645" cy="270" r="18" fill="#031022"/>
+  <path d="M540 330 Q600 365 660 330" fill="none" stroke="#031022" stroke-width="10" stroke-linecap="round"/>
+  <g opacity="0.24" stroke="#9ecfff" stroke-width="2">
+    <path d="M120 170H1080M120 510H1080"/>
+    <path d="M200 100V575M1000 100V575"/>
+  </g>
+  <text x="80" y="88" fill="#e2f4ff" font-size="44" font-family="Electrolize, Arial, sans-serif" letter-spacing="2">OCTOPUS AI</text>
+  <text x="80" y="625" fill="#87b9ff" font-size="24" font-family="Electrolize, Arial, sans-serif" letter-spacing="3">AUTOMATION AND AI WORKFLOWS</text>
+</svg>

@@ -1,8 +1,8 @@
 {
-  "$schema": "https://shadcn-vue.com/schema.json",
+  "$schema": "https://ui.shadcn.com/schema.json",
   "style": "new-york",
-  "font": "inter",
-  "typescript": false,
+  "rsc": false,
+  "tsx": false,
   "tailwind": {
     "config": "",
     "css": "src/index.css",
@@ -11,14 +11,13 @@
     "prefix": ""
   },
   "iconLibrary": "lucide",
-  "rtl": false,
-  "pointer": false,
   "aliases": {
     "components": "@/components",
     "utils": "@/lib/utils",
     "ui": "@/components/ui",
-    "lib": "@/lib",
-    "composables": "@/composables"
+    "lib": "@/lib"
   },
-  "registries": {}
+  "registries": {
+    "@moleculeui": "https://www.moleculeui.design/r/{name}.json"
+  }
 }

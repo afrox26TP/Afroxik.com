@@ -103,6 +103,11 @@ export default function PlasmaBackground({
   }, [direction]);
 
   useEffect(() => {
+    if (lowEnd) {
+      onReady?.();
+      return undefined;
+    }
+
     const container = containerRef.current;
     if (!container) return undefined;
 
@@ -249,6 +254,10 @@ export default function PlasmaBackground({
   }, [color, direction, directionMultiplier, lowEnd, mouseInteractive, opacity, scale, speed]);
 
   if (!isSupported) {
+    return <div className="fx-shader-fallback" />;
+  }
+
+  if (lowEnd) {
     return <div className="fx-shader-fallback" />;
   }
 

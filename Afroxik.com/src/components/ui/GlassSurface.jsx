@@ -32,6 +32,8 @@ export default function GlassSurface({
   xChannel = "R",
   yChannel = "G",
   mixBlendMode = "difference",
+  lowPerformance = false,
+  forceSvgFilter = false,
   className = "",
   style = {},
   children,
@@ -138,7 +140,48 @@ export default function GlassSurface({
     borderRadius: `${borderRadius}px`,
   };
 
-  const canUseSvg = supportsSvgFilterBackdrop(filterId);
+  useEffect(() => {
+    if (!forceSvgFilter || lowPerformance) return undefined;
+    const element = containerRef.current;
+    if (!element) return undefined;
+
+    const filterValue = `url(#${filterId}) saturate(${saturation})`;
+    const applyFilter = () => {
+      if (!containerRef.current) return;
+      containerRef.current.style.backdropFilter = "none";
+      containerRef.current.style.webkitBackdropFilter = "none";
+      containerRef.current.style.backdropFilter = filterValue;
+      containerRef.current.style.webkitBackdropFilter = filterValue;
+    };
+
+    // Re-apply on subsequent frames to avoid timing issues after mode toggles.
+    applyFilter();
+    const raf1 = requestAnimationFrame(applyFilter);
+    const timer = window.setTimeout(applyFilter, 40);
+    return () => {
+      cancelAnimationFrame(raf1);
+      window.clearTimeout(timer);
+    };
+  }, [filterId, forceSvgFilter, lowPerformance, saturation]);
+
+  if (lowPerformance) {
+    return (
+      <Component
+        ref={containerRef}
+        className={`glass-surface relative overflow-hidden ${className}`.trim()}
+        style={{
+          ...baseStyles,
+          background: isDarkMode ? "rgba(8, 20, 46, 0.72)" : "rgba(240, 247, 255, 0.72)",
+          border: "1px solid rgba(89, 168, 255, 0.18)",
+        }}
+        {...rest}
+      >
+        <div className="relative z-10 h-full w-full">{children}</div>
+      </Component>
+    );
+  }
+
+  const canUseSvg = forceSvgFilter || supportsSvgFilterBackdrop(filterId);
   const canUseBackdrop = supportsBackdropFilter();
 
   const visualStyles = canUseSvg

@@ -14,6 +14,8 @@ export default function LiquidGlass({
   backgroundOpacity = 0,
   saturation = 1.2,
   displace = 0.48,
+  lowPerformance = false,
+  forceSvgFilter = false,
   ...rest
 }) {
   return (
@@ -23,6 +25,8 @@ export default function LiquidGlass({
       backgroundOpacity={backgroundOpacity}
       saturation={saturation}
       displace={displace}
+      lowPerformance={lowPerformance}
+      forceSvgFilter={forceSvgFilter}
       className={cx("liquid-glass-shell liquid-glass-panel", containerClass, className)}
       {...rest}
     >

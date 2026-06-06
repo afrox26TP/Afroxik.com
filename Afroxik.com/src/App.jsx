@@ -3,6 +3,12 @@ import { getPageData } from "./lib/content";
 import PlasmaBackground from "./components/PlasmaBackground";
 import LiquidGlass from "./components/ui/liquid-glass";
 import BorderGlow from "./components/ui/BorderGlow";
+import { Button } from "@/components/ui/button";
+import {
+  WarpDialog,
+  WarpDialogContent,
+  WarpDialogTrigger,
+} from "@/components/molecule-ui/warp-dialog";
 
 function detectLowEnd() {
   const cores = navigator.hardwareConcurrency ?? 4;
@@ -10,7 +16,9 @@ function detectLowEnd() {
   const connection = navigator.connection || navigator.mozConnection || navigator.webkitConnection;
   const saveData = Boolean(connection?.saveData);
   const verySlowNetwork = connection?.effectiveType === "2g" || connection?.effectiveType === "slow-2g";
-  return cores <= 4 || mem <= 2 || saveData || verySlowNetwork;
+  const weakCpu = cores <= 2;
+  const lowMemory = mem > 0 && mem <= 3;
+  return weakCpu || lowMemory || saveData || verySlowNetwork;
 }
 const IS_LOW_END = detectLowEnd();
 const PREFERS_REDUCED_MOTION =
@@ -33,6 +41,8 @@ function pickColor() {
   }
   return PARTICLE_COLORS[0].r;
 }
+
+const PERFORMANCE_STORAGE_KEY = "afrox-performance-mode";
 
 function useParticles(canvasRef, lowEnd) {
   useEffect(() => {
@@ -425,6 +435,7 @@ function useParticles(canvasRef, lowEnd) {
 }
 
 export default function App() {
+  const [performanceMode, setPerformanceMode] = useState("auto");
   const [data, setData] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
   const [isPreloading, setIsPreloading] = useState(true);
@@ -433,6 +444,35 @@ export default function App() {
   const dataReadyRef = useRef(false);
   const warmupTimerRef = useRef(null);
   const canvasRef = useRef(null);
+
+  useEffect(() => {
+    try {
+      const storedMode = window.localStorage.getItem(PERFORMANCE_STORAGE_KEY);
+      if (storedMode === "auto" || storedMode === "high" || storedMode === "low") {
+        setPerformanceMode(storedMode);
+      }
+    } catch {
+      // Ignore storage issues in private browsing or blocked storage contexts.
+    }
+  }, []);
+
+  const useLowPerformanceMode =
+    performanceMode === "low"
+      ? true
+      : performanceMode === "high"
+        ? false
+        : IS_LOW_END;
+  const forceHighSvgFilter = performanceMode === "high";
+  const glassRenderKey = `perf-${performanceMode}`;
+
+  const handlePerformanceChange = (nextMode) => {
+    setPerformanceMode(nextMode);
+    try {
+      window.localStorage.setItem(PERFORMANCE_STORAGE_KEY, nextMode);
+    } catch {
+      // Ignore storage issues in private browsing or blocked storage contexts.
+    }
+  };
 
   // Starts a 1s warmup timer once plasma + fonts + data are all ready
   const tryStartWarmup = () => {
@@ -471,7 +511,7 @@ export default function App() {
     };
   }, []);
 
-  useParticles(canvasRef, IS_LOW_END);
+  useParticles(canvasRef, useLowPerformanceMode);
 
   const projects = data?.projects ?? [];
   const profile = data?.profile ?? {
@@ -489,7 +529,32 @@ export default function App() {
   const isContentReady = !isLoading && !isPreloading && !!data;
 
   return (
-    <div className={`fx-page text-white${IS_LOW_END ? " low-end" : ""}`}>
+    <div className={`fx-page text-white${useLowPerformanceMode ? " low-end" : ""}`}>
+
+      <div className="performance-toggle" role="group" aria-label="Performance mode">
+        <span className="performance-label">Performance</span>
+        <button
+          type="button"
+          className={`performance-btn${performanceMode === "auto" ? " is-active" : ""}`}
+          onClick={() => handlePerformanceChange("auto")}
+        >
+          Auto
+        </button>
+        <button
+          type="button"
+          className={`performance-btn${performanceMode === "high" ? " is-active" : ""}`}
+          onClick={() => handlePerformanceChange("high")}
+        >
+          High
+        </button>
+        <button
+          type="button"
+          className={`performance-btn${performanceMode === "low" ? " is-active" : ""}`}
+          onClick={() => handlePerformanceChange("low")}
+        >
+          Low
+        </button>
+      </div>
 
       <PlasmaBackground
         color="#4d8fff"
@@ -497,12 +562,12 @@ export default function App() {
         direction="forward"
         scale={1.1}
         opacity={1}
-        mouseInteractive={!IS_LOW_END && !PREFERS_REDUCED_MOTION}
-        lowEnd={IS_LOW_END}
+        mouseInteractive={!useLowPerformanceMode}
+        lowEnd={useLowPerformanceMode}
         onReady={() => { plasmaReadyRef.current = true; tryStartWarmup(); }}
       />
 
-      {!PREFERS_REDUCED_MOTION && <canvas ref={canvasRef} className="fx-canvas" aria-hidden="true" />}
+      {!useLowPerformanceMode && <canvas ref={canvasRef} className="fx-canvas" aria-hidden="true" />}
 
       {!isContentReady && (
         <div className="loading-overlay" role="status" aria-live="polite">
@@ -517,12 +582,15 @@ export default function App() {
       >
         {/* Hero / Intro Section */}
         <LiquidGlass
+          key={`${glassRenderKey}-hero`}
           as="header"
           className="hero-shell mb-24 reveal-up p-8"
           borderRadius={18}
           
           saturation={1.18}
           displace={0.42}
+          lowPerformance={useLowPerformanceMode}
+          forceSvgFilter={forceHighSvgFilter}
           style={{ "--delay": "80ms" }}
         >
           <h1 className="hero-title">{profile.name}</h1>
@@ -531,6 +599,7 @@ export default function App() {
 
         {/* Projects Section */}
         <LiquidGlass
+          key={`${glassRenderKey}-projects`}
           as="section"
           id="projects"
           className="section-shell reveal-up mb-24"
@@ -538,6 +607,8 @@ export default function App() {
           
           saturation={1.18}
           displace={0.42}
+          lowPerformance={useLowPerformanceMode}
+          forceSvgFilter={forceHighSvgFilter}
           style={{ "--delay": "180ms" }}
         >
           <div className="section-head">
@@ -550,8 +621,8 @@ export default function App() {
           <div className="project-grid-fx">
             {projects.map((project, index) => (
               <BorderGlow
-                key={project.id ?? index}
-                disabled={IS_LOW_END}
+                key={`${glassRenderKey}-${project.id ?? index}`}
+                  disabled={useLowPerformanceMode}
                 borderRadius={12}
                 colors={["#c084fc", "#f472b6", "#38bdf8"]}
                 glowColor="40 80 80"
@@ -578,7 +649,18 @@ export default function App() {
                   borderRadius={12}
                   saturation={1.15}
                   displace={0.42}
+                  lowPerformance={useLowPerformanceMode}
+                  forceSvgFilter={forceHighSvgFilter}
                 >
+                  {project.previewImage && (
+                    <img
+                      src={project.previewImage}
+                      alt={`${project.title} preview`}
+                      className="project-thumb"
+                      loading="lazy"
+                      decoding="async"
+                    />
+                  )}
                   <span className="project-label">{project.label}</span>
                   <h3 className="project-title-fx">{project.title}</h3>
                   <p className="project-copy-fx">{project.description}</p>
@@ -591,83 +673,57 @@ export default function App() {
 
         {/* Contact / Social Footer */}
         <LiquidGlass
+          key={`${glassRenderKey}-contact`}
           as="footer"
           className="contact-shell reveal-up"
           borderRadius={14}
           
           saturation={1.18}
           displace={0.42}
+          lowPerformance={useLowPerformanceMode}
+          forceSvgFilter={forceHighSvgFilter}
           style={{ "--delay": "420ms" }}
         >
           <div className="contact-content">
             <h2 className="contact-title">Get in touch</h2>
-            <div className="social-grid">
-              {profile.discord && (
-                <BorderGlow disabled={IS_LOW_END} borderRadius={8} colors={["#c084fc", "#f472b6", "#38bdf8"]} glowColor="40 80 80" glowRadius={30} glowIntensity={1} coneSpread={25}>
-                  <LiquidGlass
-                    as="div"
-                    className="social-link"
-                    borderRadius={8}
-                    saturation={1.15}
-                    displace={0.35}
-                  >
-                    <span className="social-icon">DC</span>
-                    <span className="social-text">{profile.discord}</span>
-                  </LiquidGlass>
-                </BorderGlow>
-              )}
-              {profile.github && (
-                <BorderGlow disabled={IS_LOW_END} borderRadius={8} colors={["#c084fc", "#f472b6", "#38bdf8"]} glowColor="40 80 80" glowRadius={30} glowIntensity={1} coneSpread={25}>
-                  <LiquidGlass
-                    as="a"
-                    href={profile.github}
-                    target="_blank"
-                    rel="noreferrer"
-                    className="social-link"
-                    borderRadius={8}
-                    saturation={1.15}
-                    displace={0.35}
-                  >
-                    <span className="social-icon">GH</span>
-                    <span className="social-text">{profile.githubHandle || "afrox26tp"}</span>
-                  </LiquidGlass>
-                </BorderGlow>
-              )}
-              {profile.instagram && (
-                <BorderGlow disabled={IS_LOW_END} borderRadius={8} colors={["#c084fc", "#f472b6", "#38bdf8"]} glowColor="40 80 80" glowRadius={30} glowIntensity={1} coneSpread={25}>
-                  <LiquidGlass
-                    as="a"
-                    href={profile.instagram}
-                    target="_blank"
-                    rel="noreferrer"
-                    className="social-link"
-                    borderRadius={8}
-                    saturation={1.15}
-                    displace={0.35}
-                  >
-                    <span className="social-icon">IG</span>
-                    <span className="social-text">{profile.instagramHandle || "tomik62pt"}</span>
-                  </LiquidGlass>
-                </BorderGlow>
-              )}
-              {profile.steam && (
-                <BorderGlow disabled={IS_LOW_END} borderRadius={8} colors={["#c084fc", "#f472b6", "#38bdf8"]} glowColor="40 80 80" glowRadius={30} glowIntensity={1} coneSpread={25}>
-                  <LiquidGlass
-                    as="a"
-                    href={profile.steam}
-                    target="_blank"
-                    rel="noreferrer"
-                    className="social-link"
-                    borderRadius={8}
-                    saturation={1.15}
-                    displace={0.35}
-                  >
-                    <span className="social-icon">ST</span>
-                    <span className="social-text">{profile.steamHandle || "afrox26tp"}</span>
-                  </LiquidGlass>
-                </BorderGlow>
-              )}
-            </div>
+            <p className="contact-copy">One button. All contact channels. Pick whatever is fastest for you.</p>
+            <WarpDialog>
+              <WarpDialogTrigger asChild>
+                <Button variant="outline" className="contact-trigger">
+                  Contact me!
+                </Button>
+              </WarpDialogTrigger>
+              <WarpDialogContent>
+                <h2 id="warp-contact-title" className="warp-dialog-title">Contact me</h2>
+                <p className="warp-dialog-copy">Choose any channel below and write to me directly.</p>
+                <div className="warp-contact-grid">
+                  {profile.discord && (
+                    <a className="warp-contact-link" href={`https://discord.com/users/${profile.discord}`} target="_blank" rel="noreferrer">
+                      <span className="warp-contact-kicker">Discord</span>
+                      <span className="warp-contact-value">{profile.discord}</span>
+                    </a>
+                  )}
+                  {profile.github && (
+                    <a className="warp-contact-link" href={profile.github} target="_blank" rel="noreferrer">
+                      <span className="warp-contact-kicker">GitHub</span>
+                      <span className="warp-contact-value">{profile.githubHandle || "afrox26tp"}</span>
+                    </a>
+                  )}
+                  {profile.instagram && (
+                    <a className="warp-contact-link" href={profile.instagram} target="_blank" rel="noreferrer">
+                      <span className="warp-contact-kicker">Instagram</span>
+                      <span className="warp-contact-value">{profile.instagramHandle || "tomik62pt"}</span>
+                    </a>
+                  )}
+                  {profile.steam && (
+                    <a className="warp-contact-link" href={profile.steam} target="_blank" rel="noreferrer">
+                      <span className="warp-contact-kicker">Steam</span>
+                      <span className="warp-contact-value">{profile.steamHandle || "afrox26tp"}</span>
+                    </a>
+                  )}
+                </div>
+              </WarpDialogContent>
+            </WarpDialog>
           </div>
         </LiquidGlass>
       </div>

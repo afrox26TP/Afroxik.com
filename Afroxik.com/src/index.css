@@ -90,6 +90,57 @@ input[type="range"],
   font-family: var(--font-sans);
 }
 
+.performance-toggle {
+  position: fixed;
+  top: 14px;
+  right: 14px;
+  z-index: 40;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px;
+  border-radius: 999px;
+  border: 1px solid rgba(89, 168, 255, 0.24);
+  background: rgba(7, 15, 35, 0.78);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+}
+
+.performance-label {
+  padding: 0 8px 0 6px;
+  color: rgba(210, 228, 255, 0.88);
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+}
+
+.performance-btn {
+  border: 1px solid rgba(89, 168, 255, 0.22);
+  background: transparent;
+  color: rgba(220, 235, 255, 0.85);
+  border-radius: 999px;
+  padding: 6px 10px;
+  font-family: inherit;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  line-height: 1;
+  transition: border-color 140ms ease, background-color 140ms ease, color 140ms ease;
+}
+
+.performance-btn:hover {
+  border-color: rgba(89, 168, 255, 0.48);
+  color: #ffffff;
+}
+
+.performance-btn.is-active {
+  border-color: rgba(89, 168, 255, 0.65);
+  background: rgba(89, 168, 255, 0.2);
+  color: #ffffff;
+}
+
 body,
 #root {
   min-height: 100vh;
@@ -224,6 +275,45 @@ a {
   backdrop-filter: none;
 }
 
+.low-end .fx-canvas,
+.low-end .fx-shader {
+  display: none;
+}
+
+.low-end .reveal-up {
+  animation: none;
+  opacity: 1;
+  transform: none;
+}
+
+.low-end .project-card-fx,
+.low-end .social-link,
+.low-end .section-shell,
+.low-end .contact-shell {
+  transition: none;
+  box-shadow: none;
+  text-shadow: none;
+}
+
+.low-end .project-link-fx,
+.low-end .social-link:hover {
+  text-shadow: none;
+  box-shadow: none;
+  transform: none;
+}
+
+.low-end .performance-toggle {
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+}
+
+.low-end .warp-dialog-backdrop,
+.low-end .warp-btn,
+.low-end .warp-contact-link {
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+}
+
 /* ══ SECTION SHELL ══════════════════════ */
 .section-shell {
   position: relative;
@@ -301,6 +391,21 @@ a {
 .project-card-fx > .project-link-fx {
   position: relative;
   z-index: 1;
+}
+
+.project-thumb {
+  display: block;
+  width: 100%;
+  height: 160px;
+  object-fit: cover;
+  border-radius: 10px;
+  margin-bottom: 14px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: rgba(7, 16, 38, 0.45);
+}
+
+.low-end .project-thumb {
+  border-color: rgba(255, 255, 255, 0.06);
 }
 
 .project-title-fx {
@@ -422,6 +527,14 @@ a {
   gap: 20px;
 }
 
+.contact-copy {
+  margin: 0;
+  max-width: 44rem;
+  color: rgba(213, 230, 255, 0.8);
+  font-size: 1rem;
+  line-height: 1.7;
+}
+
 /* ══ CONTACT TITLE ══════════════════════ */
 .contact-title {
   margin: 0;
@@ -493,6 +606,170 @@ a {
   color: inherit;
 }
 
+.warp-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 48px;
+  border-radius: 999px;
+  padding: 0.9rem 1.35rem;
+  font-family: var(--font-sans);
+  font-size: 0.82rem;
+  font-weight: 700;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  transition: border-color 160ms ease, background-color 160ms ease, color 160ms ease, transform 160ms ease, box-shadow 160ms ease;
+}
+
+.warp-btn--outline {
+  border: 1px solid rgba(89, 168, 255, 0.34);
+  background: rgba(65, 120, 255, 0.08);
+  color: #f3f9ff;
+  box-shadow: 0 0 0 1px rgba(89, 168, 255, 0.08) inset;
+}
+
+.warp-btn--outline:hover {
+  border-color: rgba(89, 168, 255, 0.58);
+  background: rgba(65, 120, 255, 0.16);
+  color: #ffffff;
+  transform: translateY(-1px);
+  box-shadow: 0 10px 24px rgba(24, 66, 148, 0.28);
+}
+
+.warp-btn--default {
+  border: 1px solid rgba(89, 168, 255, 0.54);
+  background: linear-gradient(135deg, rgba(89, 168, 255, 0.95), rgba(61, 109, 255, 0.92));
+  color: #ffffff;
+}
+
+.contact-trigger {
+  align-self: flex-start;
+  min-width: 220px;
+}
+
+.warp-dialog-root {
+  position: fixed;
+  inset: 0;
+  z-index: 80;
+  display: grid;
+  place-items: center;
+  padding: 1rem;
+}
+
+.warp-dialog-backdrop {
+  position: absolute;
+  inset: 0;
+  border: 0;
+  background:
+    radial-gradient(circle at top, rgba(77, 143, 255, 0.18), transparent 38%),
+    rgba(2, 6, 17, 0.82);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+}
+
+.warp-dialog-panel {
+  position: relative;
+  width: min(100%, 760px);
+  overflow: hidden;
+  border-radius: 24px;
+  border: 1px solid rgba(116, 186, 255, 0.26);
+  background: linear-gradient(180deg, rgba(6, 15, 33, 0.96), rgba(7, 18, 40, 0.92));
+  box-shadow: 0 30px 100px rgba(0, 0, 0, 0.45);
+}
+
+.warp-dialog-chrome {
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(circle at 20% 20%, rgba(124, 236, 255, 0.15), transparent 28%),
+    radial-gradient(circle at 80% 0%, rgba(77, 143, 255, 0.18), transparent 28%),
+    linear-gradient(180deg, rgba(255, 255, 255, 0.03), transparent 30%);
+  pointer-events: none;
+}
+
+.warp-dialog-body {
+  position: relative;
+  z-index: 1;
+  padding: 2rem;
+}
+
+.warp-dialog-title {
+  margin: 0;
+  font-family: "DotoLocal", "Doto", system-ui, sans-serif;
+  font-size: clamp(2rem, 5vw, 3rem);
+  line-height: 0.95;
+  letter-spacing: 0.03em;
+  color: #ffffff;
+}
+
+.warp-dialog-copy {
+  margin: 1rem 0 0;
+  color: rgba(216, 232, 255, 0.8);
+  font-size: 1rem;
+  line-height: 1.7;
+}
+
+.warp-contact-grid {
+  margin-top: 1.5rem;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.9rem;
+}
+
+.warp-contact-link {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  border-radius: 16px;
+  border: 1px solid rgba(89, 168, 255, 0.18);
+  background: rgba(8, 20, 46, 0.65);
+  padding: 1rem 1.1rem;
+  transition: border-color 160ms ease, transform 160ms ease, background-color 160ms ease;
+}
+
+.warp-contact-link:hover {
+  transform: translateY(-2px);
+  border-color: rgba(89, 168, 255, 0.4);
+  background: rgba(11, 28, 60, 0.78);
+}
+
+.warp-contact-kicker {
+  color: rgba(124, 236, 255, 0.92);
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+}
+
+.warp-contact-value {
+  color: #f3f8ff;
+  font-size: 1rem;
+  line-height: 1.45;
+  word-break: break-word;
+}
+
+.warp-dialog-close {
+  position: absolute;
+  top: 14px;
+  right: 14px;
+  z-index: 2;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 38px;
+  height: 38px;
+  border-radius: 999px;
+  border: 1px solid rgba(89, 168, 255, 0.24);
+  background: rgba(8, 20, 46, 0.7);
+  color: #dbeeff;
+  font-size: 1rem;
+}
+
+.warp-dialog-close:hover {
+  border-color: rgba(89, 168, 255, 0.5);
+  color: #ffffff;
+}
+
 /* ══ LIQUID METAL BUTTON WRAP ══════════ */
 
 /* ══ REVEAL ANIMATION ══════════════════ */
@@ -550,6 +827,37 @@ a {
     justify-content: center;
     padding: 10px 12px;
     font-size: 0.88rem;
+  }
+
+  .contact-trigger {
+    width: 100%;
+  }
+
+  .warp-dialog-body {
+    padding: 1.2rem;
+  }
+
+  .warp-contact-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .project-thumb {
+    height: 140px;
+    border-radius: 8px;
+  }
+
+  .performance-toggle {
+    left: 10px;
+    right: 10px;
+    top: 10px;
+    justify-content: center;
+    flex-wrap: wrap;
+  }
+
+  .performance-label {
+    width: 100%;
+    text-align: center;
+    padding: 2px 0 4px;
   }
 
 }

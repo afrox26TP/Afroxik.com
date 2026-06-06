@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="675" viewBox="0 0 1200 675" role="img" aria-label="24-7 Solutions preview">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#081425"/>
+      <stop offset="100%" stop-color="#142f4a"/>
+    </linearGradient>
+    <linearGradient id="ring" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#7cecff"/>
+      <stop offset="100%" stop-color="#3f74ff"/>
+    </linearGradient>
+  </defs>
+  <rect width="1200" height="675" fill="url(#bg)"/>
+  <circle cx="600" cy="337" r="180" fill="none" stroke="url(#ring)" stroke-width="24"/>
+  <path d="M600 130 L650 72 L650 150" fill="none" stroke="#7cecff" stroke-width="22" stroke-linecap="round" stroke-linejoin="round"/>
+  <text x="355" y="374" fill="#e7f6ff" font-size="150" font-family="Electrolize, Arial, sans-serif" letter-spacing="8">24/7</text>
+  <text x="370" y="460" fill="#8ebcff" font-size="50" font-family="Electrolize, Arial, sans-serif" letter-spacing="6">SOLUTIONS</text>
+  <g opacity="0.15" stroke="#9acbff" stroke-width="2">
+    <path d="M0 110h1200M0 560h1200"/>
+    <path d="M100 0v675M1100 0v675"/>
+  </g>
+</svg>

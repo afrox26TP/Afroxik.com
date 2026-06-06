@@ -1,0 +1,27 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="675" viewBox="0 0 1200 675" role="img" aria-label="Sauto Scrapper preview">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#081326"/>
+      <stop offset="100%" stop-color="#0f2c4f"/>
+    </linearGradient>
+    <linearGradient id="car" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0%" stop-color="#7cecff"/>
+      <stop offset="100%" stop-color="#4d8fff"/>
+    </linearGradient>
+  </defs>
+  <rect width="1200" height="675" fill="url(#bg)"/>
+  <g opacity="0.16" stroke="#8ec9ff" stroke-width="2">
+    <path d="M0 120h1200M0 220h1200M0 320h1200M0 420h1200M0 520h1200"/>
+  </g>
+  <g transform="translate(220 220)">
+    <rect x="90" y="120" width="620" height="120" rx="54" fill="url(#car)"/>
+    <path d="M170 120 L260 35 H530 L640 120 Z" fill="#7cd3ff"/>
+    <circle cx="250" cy="250" r="64" fill="#071120"/>
+    <circle cx="250" cy="250" r="30" fill="#7cecff"/>
+    <circle cx="560" cy="250" r="64" fill="#071120"/>
+    <circle cx="560" cy="250" r="30" fill="#7cecff"/>
+    <rect x="290" y="58" width="200" height="52" rx="18" fill="#dff4ff" opacity="0.65"/>
+  </g>
+  <text x="80" y="88" fill="#d8ecff" font-size="44" font-family="Electrolize, Arial, sans-serif" letter-spacing="2">SAUTO SCRAPPER</text>
+  <text x="80" y="625" fill="#7eb7ff" font-size="24" font-family="Electrolize, Arial, sans-serif" letter-spacing="3">AUTO LISTING DATA EXTRACTION</text>
+</svg>
