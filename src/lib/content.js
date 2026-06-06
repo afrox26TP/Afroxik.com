@@ -38,7 +38,7 @@ async function getSupabaseRuntime() {
 
 const demoProfile = {
   name: "Afrox",
-  role: "architect of digital futures",
+  role: "Student, vyvojář, nadšenec do technologií a her",
   intro: "Pan_Majitel. Nezlob Kote v bote, vidim te kolacku.",
   github: "https://github.com/afrox26TP",
   githubHandle: "afrox26TP",
