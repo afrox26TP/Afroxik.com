@@ -1,14 +1,14 @@
 import { useEffect, useRef, useState } from "react";
-import { getPageData } from "./lib/content";
+import { getPageData } from "../../src/lib/content";
 import PlasmaBackground from "./components/PlasmaBackground";
 import LiquidGlass from "./components/ui/liquid-glass";
 import BorderGlow from "./components/ui/BorderGlow";
-import { Button } from "@/components/ui/button";
 import {
   WarpDialog,
   WarpDialogContent,
   WarpDialogTrigger,
 } from "@/components/molecule-ui/warp-dialog";
+import { WarpOverlayDemo } from "./components/molecule-ui/WarpOverlayDemo";
 
 function detectLowEnd() {
   const cores = navigator.hardwareConcurrency ?? 4;
@@ -435,10 +435,27 @@ function useParticles(canvasRef, lowEnd) {
 }
 
 export default function App() {
-  const [performanceMode, setPerformanceMode] = useState("auto");
+  const [performanceMode, setPerformanceMode] = useState(() => {
+    try {
+      const storedMode = window.localStorage.getItem(PERFORMANCE_STORAGE_KEY);
+      return storedMode === "auto" || storedMode === "high" || storedMode === "low"
+        ? storedMode
+        : "auto";
+    } catch {
+      return "auto";
+    }
+  });
   const [data, setData] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
   const [isPreloading, setIsPreloading] = useState(true);
+  const [isCompactViewport, setIsCompactViewport] = useState(() =>
+    typeof window !== "undefined" ? window.innerWidth < 900 : false,
+  );
+  const [isCoarsePointer, setIsCoarsePointer] = useState(() =>
+    typeof window !== "undefined" && typeof window.matchMedia === "function"
+      ? window.matchMedia("(pointer: coarse)").matches
+      : false,
+  );
   const plasmaReadyRef = useRef(false);
   const fontsReadyRef = useRef(false);
   const dataReadyRef = useRef(false);
@@ -446,14 +463,23 @@ export default function App() {
   const canvasRef = useRef(null);
 
   useEffect(() => {
-    try {
-      const storedMode = window.localStorage.getItem(PERFORMANCE_STORAGE_KEY);
-      if (storedMode === "auto" || storedMode === "high" || storedMode === "low") {
-        setPerformanceMode(storedMode);
-      }
-    } catch {
-      // Ignore storage issues in private browsing or blocked storage contexts.
-    }
+    if (typeof window === "undefined") return undefined;
+
+    const updateViewport = () => setIsCompactViewport(window.innerWidth < 900);
+    updateViewport();
+
+    const pointerMedia =
+      typeof window.matchMedia === "function" ? window.matchMedia("(pointer: coarse)") : null;
+    const updatePointer = () => setIsCoarsePointer(Boolean(pointerMedia?.matches));
+    updatePointer();
+
+    window.addEventListener("resize", updateViewport, { passive: true });
+    pointerMedia?.addEventListener("change", updatePointer);
+
+    return () => {
+      window.removeEventListener("resize", updateViewport);
+      pointerMedia?.removeEventListener("change", updatePointer);
+    };
   }, []);
 
   const useLowPerformanceMode =
@@ -462,7 +488,8 @@ export default function App() {
       : performanceMode === "high"
         ? false
         : IS_LOW_END;
-  const forceHighSvgFilter = performanceMode === "high";
+  const shouldUseFullFx = !useLowPerformanceMode && !isCompactViewport && !isCoarsePointer;
+  const forceHighSvgFilter = performanceMode === "high" && shouldUseFullFx;
   const glassRenderKey = `perf-${performanceMode}`;
 
   const handlePerformanceChange = (nextMode) => {
@@ -499,10 +526,22 @@ export default function App() {
   }, []);
 
   useEffect(() => {
-    document.fonts.ready.then(() => {
+    const fontsReadyPromise = document.fonts?.ready;
+    if (fontsReadyPromise && typeof fontsReadyPromise.then === "function") {
+      fontsReadyPromise
+        .then(() => {
+          fontsReadyRef.current = true;
+          tryStartWarmup();
+        })
+        .catch(() => {
+          fontsReadyRef.current = true;
+          tryStartWarmup();
+        });
+    } else {
+      // Keep loading flow moving on browsers without the Font Loading API.
       fontsReadyRef.current = true;
       tryStartWarmup();
-    });
+    }
     // Safety-net: force-unblock after 4s regardless
     const fallback = window.setTimeout(() => setIsPreloading(false), 4000);
     return () => {
@@ -562,7 +601,7 @@ export default function App() {
         direction="forward"
         scale={1.1}
         opacity={1}
-        mouseInteractive={!useLowPerformanceMode}
+        mouseInteractive={shouldUseFullFx}
         lowEnd={useLowPerformanceMode}
         onReady={() => { plasmaReadyRef.current = true; tryStartWarmup(); }}
       />
@@ -622,7 +661,7 @@ export default function App() {
             {projects.map((project, index) => (
               <BorderGlow
                 key={`${glassRenderKey}-${project.id ?? index}`}
-                  disabled={useLowPerformanceMode}
+                disabled={!shouldUseFullFx}
                 borderRadius={12}
                 colors={["#c084fc", "#f472b6", "#38bdf8"]}
                 glowColor="40 80 80"
@@ -689,39 +728,15 @@ export default function App() {
             <p className="contact-copy">One button. All contact channels. Pick whatever is fastest for you.</p>
             <WarpDialog>
               <WarpDialogTrigger asChild>
-                <Button variant="outline" className="contact-trigger">
+                <button
+                  type="button"
+                  className="contact-trigger"
+                >
                   Contact me!
-                </Button>
+                </button>
               </WarpDialogTrigger>
               <WarpDialogContent>
-                <h2 id="warp-contact-title" className="warp-dialog-title">Contact me</h2>
-                <p className="warp-dialog-copy">Choose any channel below and write to me directly.</p>
-                <div className="warp-contact-grid">
-                  {profile.discord && (
-                    <a className="warp-contact-link" href={`https://discord.com/users/${profile.discord}`} target="_blank" rel="noreferrer">
-                      <span className="warp-contact-kicker">Discord</span>
-                      <span className="warp-contact-value">{profile.discord}</span>
-                    </a>
-                  )}
-                  {profile.github && (
-                    <a className="warp-contact-link" href={profile.github} target="_blank" rel="noreferrer">
-                      <span className="warp-contact-kicker">GitHub</span>
-                      <span className="warp-contact-value">{profile.githubHandle || "afrox26tp"}</span>
-                    </a>
-                  )}
-                  {profile.instagram && (
-                    <a className="warp-contact-link" href={profile.instagram} target="_blank" rel="noreferrer">
-                      <span className="warp-contact-kicker">Instagram</span>
-                      <span className="warp-contact-value">{profile.instagramHandle || "tomik62pt"}</span>
-                    </a>
-                  )}
-                  {profile.steam && (
-                    <a className="warp-contact-link" href={profile.steam} target="_blank" rel="noreferrer">
-                      <span className="warp-contact-kicker">Steam</span>
-                      <span className="warp-contact-value">{profile.steamHandle || "afrox26tp"}</span>
-                    </a>
-                  )}
-                </div>
+                <WarpOverlayDemo />
               </WarpDialogContent>
             </WarpDialog>
           </div>

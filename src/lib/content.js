@@ -1,41 +1,3 @@
-import { createClient } from '@supabase/supabase-js'
-
-const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL
-const SUPABASE_ANON_KEY = import.meta.env.VITE_SUPABASE_ANON_KEY
-
-export const supabase = SUPABASE_URL && SUPABASE_ANON_KEY 
-  ? createClient(SUPABASE_URL, SUPABASE_ANON_KEY)
-  : null
-
-let cachedSupabase = null
-let cachedHasConfig = null
-
-async function getSupabaseRuntime() {
-  if (cachedHasConfig != null) {
-    return {
-      supabase: cachedSupabase,
-      hasSupabaseConfig: cachedHasConfig,
-    }
-  }
-
-  const hasEnvConfig = Boolean(import.meta.env.VITE_SUPABASE_URL && import.meta.env.VITE_SUPABASE_ANON_KEY)
-  if (!hasEnvConfig) {
-    cachedHasConfig = false
-    cachedSupabase = null
-    return {
-      supabase: null,
-      hasSupabaseConfig: false,
-    }
-  }
-
-  cachedSupabase = supabase
-  cachedHasConfig = true
-  return {
-    supabase: cachedSupabase,
-    hasSupabaseConfig: cachedHasConfig,
-  }
-}
-
 const demoProfile = {
   name: "Afrox",
   role: "Student, vyvojář, nadšenec do technologií a her",
@@ -56,6 +18,7 @@ const demoProjects = [
     title: "RP-2025-26",
     description: "Tahova grand strategy hra vyvijena v Godotu jako rocnikova prace pro skolu.",
     url: "https://github.com/afrox26TP/RP-2025-26",
+    previewImage: "/images/rp-2025-26.png",
   },
   {
     id: 2,
@@ -63,6 +26,7 @@ const demoProjects = [
     title: "map_generator_godot",
     description: "Godot nastroj pro generovani map a rychle testovani hernich scenaru.",
     url: "https://github.com/afrox26TP/map_generator_godot",
+    previewImage: "/images/console.png",
   },
   {
     id: 3,
@@ -70,6 +34,7 @@ const demoProjects = [
     title: "Sauto_Scrapper",
     description: "Automatizovany scraper pro stahovani a cisteni dat ze Sauto.",
     url: "https://github.com/afrox26TP/Sauto_Scrapper",
+    previewImage: "/images/project-sauto.svg",
   },
   {
     id: 4,
@@ -77,6 +42,7 @@ const demoProjects = [
     title: "Octopus-AI",
     description: "AI projekt pro automatizaci, experimenty a zpracovani dat.",
     url: "https://github.com/afrox26TP/Octopus-AI",
+    previewImage: "/images/project-octopus-ai.svg",
   },
   {
     id: 5,
@@ -84,6 +50,7 @@ const demoProjects = [
     title: "24-7-solutions",
     description: "Projekt pro webove a aplikacni reseni s durazem na dostupnost.",
     url: "https://github.com/afrox26TP/24-7-solutions",
+    previewImage: "/images/project-247-solutions.svg",
   },
   {
     id: 6,
@@ -91,6 +58,7 @@ const demoProjects = [
     title: "Muzeer",
     description: "Hudebni aplikace pro spravu, objevovani a prehravani skladeb.",
     url: "https://github.com/BugHunter34/Muzeer",
+    previewImage: "/images/muzeer.png",
   },
   {
     id: 7,
@@ -98,44 +66,14 @@ const demoProjects = [
     title: "OpusCode",
     description: "Nastroj pro praci s kodem, analyzu a developer workflow.",
     url: "https://github.com/BugHunter34/OpusCode",
+    previewImage: "/images/project-opus.webp",
   },
 ]
 
-function sortByPosition(items) {
-  return [...items].sort((left, right) => (left.position ?? 0) - (right.position ?? 0))
-}
-
 export async function getPageData() {
-  const { supabase, hasSupabaseConfig } = await getSupabaseRuntime()
-
-  if (!hasSupabaseConfig || !supabase) {
-    return {
-      profile: demoProfile,
-      projects: demoProjects,
-      source: "demo",
-    }
-  }
-
-  try {
-    const [profileResult, projectsResult] = await Promise.all([
-      supabase.from("profile").select("*").limit(1).maybeSingle(),
-      supabase.from("projects").select("*").eq("published", true),
-    ])
-
-    if (profileResult.error || projectsResult.error) {
-      throw profileResult.error || projectsResult.error
-    }
-
-    return {
-      profile: profileResult.data ?? demoProfile,
-      projects: sortByPosition(projectsResult.data ?? demoProjects),
-      source: "supabase",
-    }
-  } catch {
-    return {
-      profile: demoProfile,
-      projects: demoProjects,
-      source: "demo",
-    }
+  return {
+    profile: demoProfile,
+    projects: demoProjects,
+    source: "static",
   }
 }

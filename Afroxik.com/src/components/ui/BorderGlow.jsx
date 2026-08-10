@@ -58,22 +58,6 @@ function BorderGlow({
   const frameRef = useRef(0);
   const boundsRef = useRef(null);
 
-  if (disabled) {
-    return (
-      <div
-        ref={ref}
-        className={`relative ${className}`}
-        style={{
-          borderRadius: `${borderRadius}px`,
-          ...style,
-        }}
-        {...rest}
-      >
-        {children}
-      </div>
-    );
-  }
-
   const colorSens = edgeSensitivity + 20;
 
   const applyPointerGlow = useCallback(() => {
@@ -134,6 +118,19 @@ function BorderGlow({
   const glowMask = "conic-gradient(from var(--bg-angle) at center, black 2.5%, transparent 10%, transparent 90%, black 97.5%)";
   const t = hovered ? "opacity 0.25s ease-out" : "opacity 0.75s ease-in-out";
   const boxShadow = useMemo(() => buildBoxShadow(glowColor, glowIntensity), [glowColor, glowIntensity]);
+
+  if (disabled) {
+    return (
+      <div
+        ref={ref}
+        className={`relative ${className}`}
+        style={{ borderRadius: `${borderRadius}px`, ...style }}
+        {...rest}
+      >
+        {children}
+      </div>
+    );
+  }
 
   return (
     <div

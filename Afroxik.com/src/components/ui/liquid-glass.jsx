@@ -1,4 +1,3 @@
-import React from "react";
 import GlassSurface from "./GlassSurface";
 
 function cx(...parts) {
@@ -18,15 +17,17 @@ export default function LiquidGlass({
   forceSvgFilter = false,
   ...rest
 }) {
+  const effectiveSaturation = forceSvgFilter && !lowPerformance
+    ? saturation + displace * 0.1
+    : saturation;
+
   return (
     <GlassSurface
       as={as}
       borderRadius={borderRadius}
       backgroundOpacity={backgroundOpacity}
-      saturation={saturation}
-      displace={displace}
+      saturation={effectiveSaturation}
       lowPerformance={lowPerformance}
-      forceSvgFilter={forceSvgFilter}
       className={cx("liquid-glass-shell liquid-glass-panel", containerClass, className)}
       {...rest}
     >

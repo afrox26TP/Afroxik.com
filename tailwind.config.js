@@ -4,6 +4,7 @@ export default {
   content: [
     "./index.html",
     "./src/**/*.{js,jsx}",
+    "./Afroxik.com/src/**/*.{js,jsx}",
   ],
   theme: {
     extend: {},

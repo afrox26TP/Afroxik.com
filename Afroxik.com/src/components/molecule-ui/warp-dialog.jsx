@@ -4,53 +4,26 @@ import { createPortal } from "react-dom";
 const WarpDialogContext = React.createContext(null);
 
 function useWarpDialogContext() {
-  const ctx = React.useContext(WarpDialogContext);
-  if (!ctx) {
-    throw new Error("WarpDialog components must be used inside <WarpDialog>.");
-  }
-  return ctx;
+  const context = React.useContext(WarpDialogContext);
+  if (!context) throw new Error("WarpDialog components must be used inside WarpDialog");
+  return context;
 }
 
-export function WarpDialog({ children, open: openProp, onOpenChange }) {
-  const [internalOpen, setInternalOpen] = React.useState(false);
-  const open = openProp ?? internalOpen;
-
-  const setOpen = React.useCallback(
-    (nextOpen) => {
-      if (onOpenChange) {
-        onOpenChange(nextOpen);
-      } else {
-        setInternalOpen(nextOpen);
-      }
-    },
-    [onOpenChange]
-  );
-
-  React.useEffect(() => {
-    if (!open) return undefined;
-    const onKeyDown = (event) => {
-      if (event.key === "Escape") setOpen(false);
-    };
-    const previousOverflow = document.body.style.overflow;
-    document.body.style.overflow = "hidden";
-    document.addEventListener("keydown", onKeyDown);
-    return () => {
-      document.body.style.overflow = previousOverflow;
-      document.removeEventListener("keydown", onKeyDown);
-    };
-  }, [open, setOpen]);
-
-  const value = React.useMemo(() => ({ open, setOpen }), [open, setOpen]);
+export function WarpDialog({ children }) {
+  const [open, setOpen] = React.useState(false);
+  const triggerRef = React.useRef(null);
+  const value = React.useMemo(() => ({ open, setOpen, triggerRef }), [open]);
 
   return <WarpDialogContext.Provider value={value}>{children}</WarpDialogContext.Provider>;
 }
 
 export function WarpDialogTrigger({ asChild = false, children }) {
-  const { setOpen } = useWarpDialogContext();
+  const { setOpen, triggerRef } = useWarpDialogContext();
 
   if (asChild && React.isValidElement(children)) {
     return React.cloneElement(children, {
-      "data-slot": "dialog-trigger",
+      ref: triggerRef,
+      "aria-haspopup": "dialog",
       onClick: (event) => {
         children.props.onClick?.(event);
         setOpen(true);
@@ -59,38 +32,70 @@ export function WarpDialogTrigger({ asChild = false, children }) {
   }
 
   return (
-    <button type="button" data-slot="dialog-trigger" onClick={() => setOpen(true)}>
+    <button ref={triggerRef} type="button" aria-haspopup="dialog" onClick={() => setOpen(true)}>
       {children}
     </button>
   );
 }
 
 export function WarpDialogContent({ children }) {
-  const { open, setOpen } = useWarpDialogContext();
+  const { open, setOpen, triggerRef } = useWarpDialogContext();
+  const panelRef = React.useRef(null);
 
-  if (!open || typeof document === "undefined") return null;
+  React.useEffect(() => {
+    if (!open) return undefined;
+
+    const previousOverflow = document.body.style.overflow;
+    const triggerElement = triggerRef.current;
+    const onKeyDown = (event) => {
+      if (event.key === "Escape") setOpen(false);
+    };
+
+    document.body.style.overflow = "hidden";
+    document.addEventListener("keydown", onKeyDown);
+    requestAnimationFrame(() => panelRef.current?.focus());
+
+    return () => {
+      document.body.style.overflow = previousOverflow;
+      document.removeEventListener("keydown", onKeyDown);
+      triggerElement?.focus?.();
+    };
+  }, [open, setOpen, triggerRef]);
+
+  if (!open) return null;
 
   return createPortal(
-    <div className="warp-dialog-root" role="presentation">
+    <div className="warp-dialog-root">
       <button
         type="button"
         className="warp-dialog-backdrop"
-        aria-label="Close dialog"
+        aria-label="Zavřít kontakty"
         onClick={() => setOpen(false)}
       />
-      <div className="warp-dialog-panel" role="dialog" aria-modal="true">
+      <div
+        ref={panelRef}
+        className="warp-dialog-panel"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="contact-dialog-title"
+        tabIndex={-1}
+      >
         <div className="warp-dialog-chrome" aria-hidden="true" />
         <button
           type="button"
           className="warp-dialog-close"
-          aria-label="Close dialog"
+          aria-label="Zavřít kontakty"
           onClick={() => setOpen(false)}
         >
-          x
+          ×
         </button>
-        <div className="warp-dialog-body">{children}</div>
+        <div className="warp-dialog-body">
+          <h2 id="contact-dialog-title" className="warp-dialog-title">Contact me</h2>
+          <p className="warp-dialog-copy">Choose a channel and write to me directly.</p>
+          {children}
+        </div>
       </div>
     </div>,
-    document.body
+    document.body,
   );
 }

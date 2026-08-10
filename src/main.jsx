@@ -1,13 +1,15 @@
 import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
-import './index.css'
-import App from './App.jsx'
-import { ThemeProvider } from './context/ThemeContext'
+import MainApp from '../Afroxik.com/src/App'
+import './base.css'
+import '../Afroxik.com/src/index.css'
+
+if (window.location.pathname === '/dev' || window.location.pathname.startsWith('/dev/')) {
+  window.history.replaceState(null, '', '/')
+}
 
 createRoot(document.getElementById('root')).render(
   <StrictMode>
-    <ThemeProvider>
-      <App />
-    </ThemeProvider>
+    <MainApp />
   </StrictMode>,
 )

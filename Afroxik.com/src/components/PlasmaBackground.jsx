@@ -95,7 +95,12 @@ export default function PlasmaBackground({
   onReady,
 }) {
   const containerRef = useRef(null);
+  const onReadyRef = useRef(onReady);
   const [isSupported, setIsSupported] = useState(true);
+
+  useEffect(() => {
+    onReadyRef.current = onReady;
+  }, [onReady]);
 
   const directionMultiplier = useMemo(() => {
     if (direction === "reverse") return -1;
@@ -104,12 +109,15 @@ export default function PlasmaBackground({
 
   useEffect(() => {
     if (lowEnd) {
-      onReady?.();
+      onReadyRef.current?.();
       return undefined;
     }
 
     const container = containerRef.current;
-    if (!container) return undefined;
+    if (!container) {
+      onReadyRef.current?.();
+      return undefined;
+    }
 
     const customColorRgb = hexToRgb(color);
     let raf = 0;
@@ -123,6 +131,7 @@ export default function PlasmaBackground({
     let program;
     let handleMouseMove;
     let isPaused = document.hidden;
+    let active = true;
 
     try {
       renderer = new Renderer({
@@ -132,14 +141,20 @@ export default function PlasmaBackground({
         dpr: Math.min(window.devicePixelRatio || 1, lowEnd ? 1.1 : 1.8),
       });
     } catch {
-      setIsSupported(false);
-      return undefined;
+      queueMicrotask(() => {
+        if (active) setIsSupported(false);
+      });
+      onReadyRef.current?.();
+      return () => { active = false; };
     }
 
     const gl = renderer.gl;
     if (!gl) {
-      setIsSupported(false);
-      return undefined;
+      queueMicrotask(() => {
+        if (active) setIsSupported(false);
+      });
+      onReadyRef.current?.();
+      return () => { active = false; };
     }
 
     const canvas = gl.canvas;
@@ -203,6 +218,13 @@ export default function PlasmaBackground({
 
     const t0 = performance.now();
     let readyFired = false;
+    const fireReady = () => {
+      if (readyFired) return;
+      readyFired = true;
+      onReadyRef.current?.();
+    };
+    fireReady();
+
     const loop = (now) => {
       raf = 0;
       if (isPaused) return;
@@ -217,10 +239,7 @@ export default function PlasmaBackground({
 
       program.uniforms.iTime.value = timeValue;
       renderer.render({ scene: mesh });
-      if (!readyFired) {
-        readyFired = true;
-        onReady?.();
-      }
+      fireReady();
       if (!raf) raf = requestAnimationFrame(loop);
     };
 
@@ -239,6 +258,7 @@ export default function PlasmaBackground({
     raf = requestAnimationFrame(loop);
 
     return () => {
+      active = false;
       cancelAnimationFrame(raf);
       cleanupResize();
       document.removeEventListener("visibilitychange", handleVisibilityChange);
