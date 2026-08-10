@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { getPageData } from "../../src/lib/content";
+import { getPageData } from "./lib/content";
 import PlasmaBackground from "./components/PlasmaBackground";
 import LiquidGlass from "./components/ui/liquid-glass";
 import BorderGlow from "./components/ui/BorderGlow";

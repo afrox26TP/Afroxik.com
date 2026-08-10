@@ -9,7 +9,7 @@ const demoProfile = {
   instagramHandle: "Tomi",
   steam: "https://steamcommunity.com/id/1234dg7548/",
   steamHandle: "afrox26tp",
-}
+};
 
 const demoProjects = [
   {
@@ -68,12 +68,12 @@ const demoProjects = [
     url: "https://github.com/BugHunter34/OpusCode",
     previewImage: "/images/project-opus.webp",
   },
-]
+];
 
 export async function getPageData() {
   return {
     profile: demoProfile,
     projects: demoProjects,
     source: "static",
-  }
+  };
 }
