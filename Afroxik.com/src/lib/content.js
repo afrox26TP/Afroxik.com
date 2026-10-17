@@ -30,6 +30,7 @@ const homepages = {
   OpusCode: "https://opuscode.dev",
   Muzeer: "https://muzeer.com",
   Sauto_Scrapper: "https://autoidx.cz",
+  "24-7-solutions": "https://solutions247.dev",
 };
 
 // Repo, které se ukáže jako velký 3D screenshot pod úvodem. Texty bere z GitHubu, screenshot je lokální,
