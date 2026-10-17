@@ -1,7 +1,9 @@
 import { useEffect, useRef, useState } from "react";
+import { useT } from "../../lib/i18n";
 
 // Úvodní loader s procenty (inspirace Lepshee). Procenta plynule dohánějí skutečný stav načítání.
 export default function Preloader({ progress, done, name }) {
+  const t = useT();
   const rootRef = useRef(null);
   const percentRef = useRef(null);
   const targetRef = useRef(0);
@@ -57,11 +59,11 @@ export default function Preloader({ progress, done, name }) {
       className={`preloader${finishing ? " is-done" : ""}`}
       role="status"
       aria-live="polite"
-      aria-label="Načítání stránky"
+      aria-label={t.preloader.label}
     >
       <div className="preloader__inner">
         <p className="preloader__title">
-          Loaduju <span>{name}</span>
+          {t.preloader.title} <span>{name}</span>
         </p>
         <div className="preloader__line" aria-hidden="true">
           <span className="preloader__fill" />

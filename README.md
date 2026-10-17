@@ -23,7 +23,9 @@ Produkční výstup vznikne v `dist/`.
 
 ## Obsah a struktura
 
-- Texty, kontakty a toolbox: `Afroxik.com/src/lib/content.js`
+- Texty v češtině a angličtině: `Afroxik.com/src/lib/i18n.js`. Jazyk se poprvé vybere podle prohlížeče,
+  přepínač CZ/EN je v navigaci a volba se pamatuje. Anglická verze má adresu `/en`.
+- Kontakty a toolbox: `Afroxik.com/src/lib/content.js`
 - Projekty: veřejná repa z GitHubu, prohlížeč je načítá přes GitHub API (bez tokenu, s 10min cache v localStorage).
   Název, popis, jazyk a topics se berou z GitHubu. V `content.js` jde repo skrýt (`hiddenRepos`),
   přidat repo z cizího účtu (`extraRepos`) a vybrat to, které se ukáže jako velký 3D screenshot

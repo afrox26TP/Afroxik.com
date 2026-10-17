@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import { Mesh, Program, Renderer, Texture, Triangle } from "ogl";
 import { CAT_HOME_SELECTOR, CAT_POSTER_SRC } from "../../lib/cat";
 import { PREFERS_REDUCED_MOTION } from "../../lib/device";
+import { useT } from "../../lib/i18n";
 
 const VIDEO_SRC = "/media/damdam-cat.mp4";
 const AUDIO_SRC = "/media/damdam.m4a";
@@ -48,6 +49,7 @@ function bufferLevelFor(scale) {
  * Klik pustí písničku synchronizovanou s videem.
  */
 export default function CatBuddy({ mode = "follow", animate = true, home = false }) {
+  const t = useT();
   const rootRef = useRef(null);
   const tiltRef = useRef(null);
   const hostRef = useRef(null);
@@ -478,7 +480,7 @@ export default function CatBuddy({ mode = "follow", animate = true, home = false
       ref={rootRef}
       type="button"
       className={`cat-buddy${home ? " is-home" : ""}${playing ? " is-playing" : ""}${hint && !home ? " show-hint" : ""}`}
-      aria-label="Kočka – pustit písničku Dam dam didi didi"
+      aria-label={t.cat.label}
       aria-pressed={playing}
       // V logu je jen ozdoba – klik propadne na odkaz loga pod ní.
       inert={home}
@@ -496,7 +498,7 @@ export default function CatBuddy({ mode = "follow", animate = true, home = false
         <i>♪</i>
       </span>
       <span className="cat-buddy__bubble" aria-hidden="true">
-        {playing ? "dam dam didi didi ♪" : "klikni na mě ♪"}
+        {playing ? "dam dam didi didi ♪" : t.cat.hint}
       </span>
     </button>
   );

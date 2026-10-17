@@ -1,6 +1,9 @@
 import { IconArrowRight } from "../ui/icons";
+import { useT } from "../../lib/i18n";
 
 export default function Hero({ ref, profile, onContact }) {
+  const t = useT();
+
   return (
     <section ref={ref} className="hero" id="top" aria-labelledby="hero-title">
       <div className="hero__inner">
@@ -35,13 +38,13 @@ export default function Hero({ ref, profile, onContact }) {
 
         <div className="hero__actions">
           <a className="pill-button pill-button--blue" href="#projects">
-            <span className="pill-button__chip">Projekty</span>
-            <span className="pill-button__label">mrkni, co stavím</span>
+            <span className="pill-button__chip">{t.sections.projects}</span>
+            <span className="pill-button__label">{t.hero.projects}</span>
             <IconArrowRight className="pill-button__arrow" />
           </a>
           <button type="button" className="pill-button pill-button--violet" onClick={onContact}>
-            <span className="pill-button__chip">Kontakt</span>
-            <span className="pill-button__label">napiš mi</span>
+            <span className="pill-button__chip">{t.sections.contact}</span>
+            <span className="pill-button__label">{t.hero.contact}</span>
             <IconArrowRight className="pill-button__arrow" />
           </button>
         </div>

@@ -1,6 +1,7 @@
 import BorderGlow from "../ui/BorderGlow";
 import Reveal from "../ui/Reveal";
 import { IconArrowUpRight, IconGithub } from "../ui/icons";
+import { useT } from "../../lib/i18n";
 
 // Dlouhé názvy (map_generator_godot) se smí zalomit za podtržítkem nebo pomlčkou.
 function breakable(title) {
@@ -18,6 +19,8 @@ function trackSpotlight(event) {
 }
 
 function ProjectCard({ project }) {
+  const t = useT();
+
   return (
     <a
       className="project-card"
@@ -47,7 +50,7 @@ function ProjectCard({ project }) {
         <h3 className="project-card__title">{breakable(project.title)}</h3>
         {project.description && <p className="project-card__desc">{project.description}</p>}
         <div className="project-card__foot">
-          <ul className="tag-list" aria-label="Technologie">
+          <ul className="tag-list" aria-label={t.tech}>
             {project.tags.map((tag) => (
               <li key={tag} className="tag">
                 {tag}
@@ -55,7 +58,7 @@ function ProjectCard({ project }) {
             ))}
           </ul>
           <span className="project-card__open">
-            Otevřít <IconArrowUpRight />
+            {t.projects.open} <IconArrowUpRight />
           </span>
         </div>
       </div>
@@ -64,6 +67,7 @@ function ProjectCard({ project }) {
 }
 
 export default function Projects({ projects, githubUrl, fullFx }) {
+  const t = useT();
   // Projekt ze showcase nad sekcí se v mřížce neopakuje.
   const gridProjects = projects.filter((project) => !project.showcase);
   const count = String(gridProjects.length).padStart(2, "0");
@@ -73,20 +77,20 @@ export default function Projects({ projects, githubUrl, fullFx }) {
       <div className="section__shell">
         <Reveal className="section__head">
           <div>
-            <span className="kicker">Další projekty · {count}</span>
+            <span className="kicker">
+              {t.projects.kicker} · {count}
+            </span>
             <h2 id="projects-title" className="section__title">
-              Na čem jsem <span className="dim">makal.</span>
+              {t.projects.title[0]} <span className="dim">{t.projects.title[1]}</span>
             </h2>
           </div>
-          <p className="section__lead">
-            Hry v Godotu, weby v JavaScriptu, scrapery a AI experimenty v Pythonu. Karta tě hodí rovnou na GitHub.
-          </p>
+          <p className="section__lead">{t.projects.lead}</p>
         </Reveal>
 
         {projects.length === 0 ? (
           // GitHub neodpověděl a v prohlížeči není ani uložená verze.
           <div className="project-empty">
-            <p>Projekty se teď nepodařilo načíst z GitHubu. Najdeš je přímo na mém profilu.</p>
+            <p>{t.projects.empty}</p>
             <a className="btn-ghost" href={githubUrl} target="_blank" rel="noreferrer">
               <IconGithub /> GitHub <IconArrowUpRight />
             </a>

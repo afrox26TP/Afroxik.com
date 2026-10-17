@@ -1,14 +1,17 @@
 import { BrandMark, IconArrowUp } from "../ui/icons";
+import { useT } from "../../lib/i18n";
 
 const YEAR = new Date().getFullYear();
 
 // Skleněná patička se svítící linkou nahoře (inspirace Streamally).
 export default function SiteFooter({ profile, sections, projects, socials, copiedKey, onCopy, onContact }) {
+  const t = useT();
+
   return (
     <footer className="site-footer">
       <div className="site-footer__grid">
         <div className="footer-brand">
-          <a href="#top" className="brand brand--lg" aria-label={`${profile.name} – zpět nahoru`}>
+          <a href="#top" className="brand brand--lg" aria-label={`${profile.name} – ${t.backToTop}`}>
             <BrandMark className="brand__mark" />
             <span className="brand__name" aria-hidden="true">
               {profile.name}
@@ -17,8 +20,8 @@ export default function SiteFooter({ profile, sections, projects, socials, copie
           <p className="footer-brand__tagline">{profile.tagline.join(" ")}</p>
         </div>
 
-        <nav className="footer-col" aria-label="Sekce">
-          <h2 className="footer-col__title">Navigace</h2>
+        <nav className="footer-col" aria-label={t.footer.sections}>
+          <h2 className="footer-col__title">{t.footer.navigation}</h2>
           <ul>
             {sections.map((section) => (
               <li key={section.id}>
@@ -29,14 +32,14 @@ export default function SiteFooter({ profile, sections, projects, socials, copie
             ))}
             <li>
               <button type="button" className="footer-link" onClick={onContact}>
-                Všechny kontakty
+                {t.allContacts}
               </button>
             </li>
           </ul>
         </nav>
 
-        <nav className="footer-col" aria-label="Vybrané projekty">
-          <h2 className="footer-col__title">Projekty</h2>
+        <nav className="footer-col" aria-label={t.footer.projects}>
+          <h2 className="footer-col__title">{t.sections.projects}</h2>
           <ul>
             {projects.slice(0, 4).map((project) => (
               <li key={project.id}>
@@ -48,8 +51,8 @@ export default function SiteFooter({ profile, sections, projects, socials, copie
           </ul>
         </nav>
 
-        <nav className="footer-col" aria-label="Sociální sítě">
-          <h2 className="footer-col__title">Sítě</h2>
+        <nav className="footer-col" aria-label={t.footer.socialsLabel}>
+          <h2 className="footer-col__title">{t.footer.socials}</h2>
           <ul>
             {socials.map((social) => (
               <li key={social.id}>
@@ -58,9 +61,9 @@ export default function SiteFooter({ profile, sections, projects, socials, copie
                     type="button"
                     className="footer-link"
                     onClick={() => onCopy(social.copy, `footer-${social.id}`)}
-                    aria-label={`${social.label}: ${social.handle} – zkopírovat`}
+                    aria-label={`${social.label}: ${social.handle} – ${t.copy}`}
                   >
-                    {copiedKey === `footer-${social.id}` ? "Zkopírováno!" : social.label}
+                    {copiedKey === `footer-${social.id}` ? t.copied : social.label}
                   </button>
                 ) : (
                   <a className="footer-link" href={social.href} target="_blank" rel="noreferrer">
@@ -77,9 +80,9 @@ export default function SiteFooter({ profile, sections, projects, socials, copie
         <span>
           © {YEAR} {profile.name}
         </span>
-        <span>Postaveno v Reactu, Vite a WebGL.</span>
+        <span>{t.footer.built}</span>
         <a href="#top" className="to-top">
-          Nahoru <IconArrowUp />
+          {t.footer.toTop} <IconArrowUp />
         </a>
       </div>
     </footer>

@@ -1,12 +1,8 @@
-// Veškerý obsah webu na jednom místě – texty a kontakty. Projekty se načítají z GitHubu.
+// Data webu – kontakty, toolbox a projekty z GitHubu. Texty v obou jazycích jsou v i18n.js.
 
 const profile = {
   name: "Afrox",
   handle: "afrox26TP",
-  role: "Student · Vývojář · Gamer",
-  tagline: ["Projekty, aplikace, hry", "a vývojové experimenty."],
-  intro: "Pan_Majitel. Nezlob Kote v bote, vidim te kolacku.",
-  bio: "Student, vývojář a nadšenec do technologií a her. Píšu v Godotu, Pythonu i JavaScriptu – od tahové grand strategy přes scrapery až po weby a AI experimenty.",
   githubSince: 2022,
   heroTags: ["Godot", "Python", "React", "WebGL"],
 };
@@ -27,14 +23,14 @@ const hiddenRepos = ["afrox26TP"];
 // Repa z cizích účtů, na kterých jsem dělal. Mezi mými je GitHub nevrátí, proto se načtou zvlášť.
 const extraRepos = ["BugHunter34/Muzeer", "BugHunter34/OpusCode"];
 
-// Repo, které se ukáže jako velký 3D screenshot pod úvodem. Texty bere z GitHubu, screenshot je lokální.
+// Repo, které se ukáže jako velký 3D screenshot pod úvodem. Texty bere z GitHubu, screenshot je lokální,
+// nadpis nad ním je v i18n.js (showcase.kicker).
 const featured = {
   repo: "RP-2025-26",
   src: "/images/rp-2025-26.webp",
   srcSet: "/images/project-screenshot.webp 1200w, /images/rp-2025-26.webp 1800w",
   width: 1800,
   height: 970,
-  kicker: "Featured · Ročníková práce",
 };
 
 const accents = [
@@ -105,11 +101,8 @@ async function loadRepos() {
   }
 }
 
-export const navSections = [
-  { id: "projects", label: "Projekty" },
-  { id: "about", label: "O mně" },
-  { id: "contact", label: "Kontakt" },
-];
+// Id sekcí v pořadí navigace, popisky jsou v i18n.js (sections).
+export const navSections = ["projects", "about", "contact"];
 
 export async function getPageData() {
   const projects = (await loadRepos())

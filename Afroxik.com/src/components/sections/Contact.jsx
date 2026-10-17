@@ -1,8 +1,10 @@
 import Reveal from "../ui/Reveal";
 import { IconArrowUpRight, IconDiscord, IconGithub } from "../ui/icons";
+import { useT } from "../../lib/i18n";
 
 // Velký Discord handle, který se po kliknutí zkopíruje (inspirace e-mailem na Lepshee).
 export default function Contact({ socials, copiedKey, onCopy, onContact }) {
+  const t = useT();
   const discord = socials.find((social) => social.id === "discord");
   const github = socials.find((social) => social.id === "github");
   const copied = copiedKey === "contact-discord";
@@ -11,33 +13,33 @@ export default function Contact({ socials, copiedKey, onCopy, onContact }) {
     <section className="section section--hairline contact" id="contact" aria-labelledby="contact-title">
       <div className="section__shell">
         <Reveal className="contact__inner">
-          <span className="kicker">Kontakt</span>
+          <span className="kicker">{t.sections.contact}</span>
           <h2 id="contact-title" className="section__title contact__title">
-            Ozvi se. <span className="dim">Jedno tlačítko, všechny kanály.</span>
+            {t.contact.title[0]} <span className="dim">{t.contact.title[1]}</span>
           </h2>
 
           {discord && (
             <div className={`copy-handle${copied ? " is-copied" : ""}`}>
               <span className="copy-handle__label">
-                <IconDiscord /> Discord · klikni a zkopíruj
+                <IconDiscord /> {t.contact.discord}
               </span>
               <button
                 type="button"
                 className="copy-handle__value"
                 onClick={() => onCopy(discord.copy, "contact-discord")}
-                aria-label={`Zkopírovat Discord: ${discord.handle}`}
+                aria-label={`${t.contact.copyDiscord}: ${discord.handle}`}
               >
                 {discord.handle}
               </button>
               <span className="copy-tooltip" role="status">
-                {copied ? "Zkopírováno!" : ""}
+                {copied ? t.copied : ""}
               </span>
             </div>
           )}
 
           <div className="contact__actions">
             <button type="button" className="btn-colorful" onClick={onContact}>
-              Všechny kontakty
+              {t.allContacts}
             </button>
             {github && (
               <a className="btn-ghost" href={github.href} target="_blank" rel="noreferrer">

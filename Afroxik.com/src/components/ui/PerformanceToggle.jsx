@@ -1,4 +1,5 @@
 import { IconGauge } from "./icons";
+import { useT } from "../../lib/i18n";
 
 const MODES = [
   { id: "auto", label: "Auto" },
@@ -7,14 +8,15 @@ const MODES = [
 ];
 
 export default function PerformanceToggle({ value, onChange, className = "" }) {
+  const t = useT();
   const index = Math.max(0, MODES.findIndex((mode) => mode.id === value));
 
   return (
     <div
       className={`perf-toggle ${className}`.trim()}
       role="group"
-      aria-label="Výkon efektů"
-      title="Výkon efektů"
+      aria-label={t.nav.perf}
+      title={t.nav.perf}
       style={{ "--idx": index }}
     >
       <span className="perf-toggle__icon" aria-hidden="true">

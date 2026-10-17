@@ -1,8 +1,9 @@
 import { useEffect, useState } from "react";
 import LetterSwap from "../ui/LetterSwap";
 import PerformanceToggle from "../ui/PerformanceToggle";
-import { BrandMark, IconCat, IconClose, IconMenu } from "../ui/icons";
+import { BrandMark, IconCat, IconClose, IconGlobe, IconMenu } from "../ui/icons";
 import { CAT_POSTER_SRC } from "../../lib/cat";
+import { useT } from "../../lib/i18n";
 
 // Plovoucí „pill“ navigace se skleněným pozadím (inspirace Streamally + Komunita).
 export default function SiteNav({
@@ -13,8 +14,11 @@ export default function SiteNav({
   onPerformanceChange,
   catEnabled,
   onCatToggle,
+  onLangToggle,
   onContact,
 }) {
+  const t = useT();
+  const langSwitch = t.nav.langSwitch;
   const [menuOpen, setMenuOpen] = useState(false);
   const [scrolled, setScrolled] = useState(() => typeof window !== "undefined" && window.scrollY > 24);
 
@@ -55,8 +59,8 @@ export default function SiteNav({
   return (
     <>
       <header className={`site-nav${scrolled ? " is-scrolled" : ""}${menuOpen ? " is-menu-open" : ""}`}>
-        <nav className="site-nav__inner" aria-label="Hlavní navigace">
-          <a href="#top" className="brand" onClick={closeMenu} aria-label={`${name} – zpět nahoru`}>
+        <nav className="site-nav__inner" aria-label={t.nav.label}>
+          <a href="#top" className="brand" onClick={closeMenu} aria-label={`${name} – ${t.backToTop}`}>
             {/* Domeček kočky: šedá silueta, dokud kočka lítá venku; schovaná sem přiletí a tancuje. */}
             <span className="brand__home" data-cat={catEnabled ? "out" : "home"}>
               <BrandMark className="brand__frame" letter={false} />
@@ -87,21 +91,31 @@ export default function SiteNav({
               type="button"
               className="cat-toggle"
               aria-pressed={catEnabled}
-              aria-label={catEnabled ? "Schovat kočku do loga" : "Pustit kočku ven"}
-              title={catEnabled ? "Schovat kočku do loga" : "Pustit kočku ven"}
+              aria-label={catEnabled ? t.nav.catHide : t.nav.catShow}
+              title={catEnabled ? t.nav.catHide : t.nav.catShow}
               onClick={onCatToggle}
             >
               <IconCat />
             </button>
+            <button
+              type="button"
+              className="lang-toggle"
+              lang={langSwitch.lang}
+              aria-label={langSwitch.label}
+              title={langSwitch.label}
+              onClick={onLangToggle}
+            >
+              {langSwitch.short}
+            </button>
             <button type="button" className="nav-cta" onClick={handleContact}>
-              <LetterSwap text="Napiš mi" />
+              <LetterSwap text={t.contactMe} />
             </button>
             <button
               type="button"
               className="nav-toggle"
               aria-expanded={menuOpen}
               aria-controls="mobile-menu"
-              aria-label={menuOpen ? "Zavřít menu" : "Otevřít menu"}
+              aria-label={menuOpen ? t.nav.menuClose : t.nav.menuOpen}
               onClick={() => setMenuOpen((open) => !open)}
             >
               {menuOpen ? <IconClose /> : <IconMenu />}
@@ -127,10 +141,19 @@ export default function SiteNav({
           </ul>
           <PerformanceToggle value={performanceMode} onChange={onPerformanceChange} />
           <button type="button" className="cat-toggle cat-toggle--wide" aria-pressed={catEnabled} onClick={onCatToggle}>
-            <IconCat /> {catEnabled ? "Kočka: venku" : "Kočka: v logu"}
+            <IconCat /> {catEnabled ? t.nav.catOut : t.nav.catHome}
+          </button>
+          <button
+            type="button"
+            className="lang-toggle lang-toggle--wide"
+            lang={langSwitch.lang}
+            aria-label={langSwitch.label}
+            onClick={onLangToggle}
+          >
+            <IconGlobe /> {langSwitch.name}
           </button>
           <button type="button" className="nav-cta nav-cta--lg" onClick={handleContact}>
-            Napiš mi
+            {t.contactMe}
           </button>
         </div>
       )}

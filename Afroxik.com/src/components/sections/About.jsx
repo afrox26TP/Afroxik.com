@@ -1,5 +1,6 @@
 import Reveal from "../ui/Reveal";
 import { IconArrowRight, IconCheck, IconGamepad, IconGithub, socialIcons } from "../ui/icons";
+import { useT } from "../../lib/i18n";
 
 function HudStage({ tag, glyph }) {
   return (
@@ -20,19 +21,20 @@ function HudStage({ tag, glyph }) {
 
 // Sekce „O mně“ – herní HUD karty (inspirace karty zakladatelů na Streamally) a toolbox (inspirace Komunita).
 export default function About({ profile, socials, toolbox, projects, copiedKey, onCopy, onContact }) {
+  const t = useT();
   const stats = [
-    { value: String(projects.length).padStart(2, "0"), label: "projektů v portfoliu" },
-    { value: String(toolbox.length).padStart(2, "0"), label: "nástrojů v toolboxu" },
-    { value: String(profile.githubSince), label: "na GitHubu od roku" },
+    { value: String(projects.length).padStart(2, "0"), label: t.about.stats[0] },
+    { value: String(toolbox.length).padStart(2, "0"), label: t.about.stats[1] },
+    { value: String(profile.githubSince), label: t.about.stats[2] },
   ];
 
   return (
     <section className="section section--hairline" id="about" aria-labelledby="about-title">
       <div className="section__shell">
         <Reveal className="section__head section__head--center">
-          <span className="kicker">O mně</span>
+          <span className="kicker">{t.sections.about}</span>
           <h2 id="about-title" className="section__title">
-            Kdo za tím <span className="glow">stojí.</span>
+            {t.about.title[0]} <span className="glow">{t.about.title[1]}</span>
           </h2>
         </Reveal>
 
@@ -58,8 +60,8 @@ export default function About({ profile, socials, toolbox, projects, copiedKey, 
                           type="button"
                           className={`icon-btn${copied ? " is-copied" : ""}`}
                           onClick={() => onCopy(social.copy, `about-${social.id}`)}
-                          aria-label={`${social.label}: ${social.handle} – zkopírovat`}
-                          title={copied ? "Zkopírováno!" : `${social.label}: ${social.handle}`}
+                          aria-label={`${social.label}: ${social.handle} – ${t.copy}`}
+                          title={copied ? t.copied : `${social.label}: ${social.handle}`}
                         >
                           {copied ? <IconCheck /> : <Icon />}
                         </button>
@@ -86,18 +88,16 @@ export default function About({ profile, socials, toolbox, projects, copiedKey, 
 
           <Reveal mode="self" style={{ "--delay": "90ms" }}>
             <article className="hud-card hud-card--join">
-              <HudStage tag="player_02 · ty?" glyph="?" />
+              <HudStage tag={t.about.joinTag} glyph="?" />
               <div className="hud-card__body">
-                <span className="hud-card__role">Volný slot</span>
-                <h3 className="hud-card__name">Pojď do party</h3>
+                <span className="hud-card__role">{t.about.joinRole}</span>
+                <h3 className="hud-card__name">{t.about.joinName}</h3>
                 <p className="hud-card__meta">
-                  <IconGamepad /> Hry · Weby · AI
+                  <IconGamepad /> {t.about.joinMeta}
                 </p>
-                <p className="hud-card__bio">
-                  Máš nápad na hru, web nebo AI bota? Nebo chceš jen probrat projekt? Napiš mi.
-                </p>
+                <p className="hud-card__bio">{t.about.joinBio}</p>
                 <button type="button" className="text-cta" onClick={onContact}>
-                  Napsat zprávu <IconArrowRight />
+                  {t.about.joinCta} <IconArrowRight />
                 </button>
               </div>
             </article>
@@ -116,7 +116,7 @@ export default function About({ profile, socials, toolbox, projects, copiedKey, 
         <Reveal className="toolbox">
           <div className="toolbox__head">
             <span className="kicker">Toolbox</span>
-            <p className="toolbox__copy">Jazyky a nástroje, které se v mých projektech točí nejvíc.</p>
+            <p className="toolbox__copy">{t.about.toolbox}</p>
           </div>
           <ul className="toolbox__list">
             {toolbox.map((tool, index) => (

@@ -1,6 +1,7 @@
 import React from "react";
 import { createPortal } from "react-dom";
 import { IconClose } from "../ui/icons";
+import { useT } from "../../lib/i18n";
 
 const WarpDialogContext = React.createContext(null);
 
@@ -51,7 +52,8 @@ export function WarpDialogTrigger({ asChild = false, children }) {
   );
 }
 
-export function WarpDialogContent({ title = "Napiš mi", description = "Vyber si kanál a napiš mi napřímo.", children }) {
+export function WarpDialogContent({ title, description, children }) {
+  const t = useT();
   const { open, setOpen } = useWarpDialogContext();
   const panelRef = React.useRef(null);
 
@@ -101,7 +103,7 @@ export function WarpDialogContent({ title = "Napiš mi", description = "Vyber si
       <button
         type="button"
         className="warp-dialog-backdrop"
-        aria-label="Zavřít kontakty"
+        aria-label={t.dialog.close}
         tabIndex={-1}
         onClick={() => setOpen(false)}
       />
@@ -115,11 +117,11 @@ export function WarpDialogContent({ title = "Napiš mi", description = "Vyber si
         tabIndex={-1}
       >
         <div className="warp-dialog-chrome" aria-hidden="true" />
-        <button type="button" className="warp-dialog-close" aria-label="Zavřít kontakty" onClick={() => setOpen(false)}>
+        <button type="button" className="warp-dialog-close" aria-label={t.dialog.close} onClick={() => setOpen(false)}>
           <IconClose />
         </button>
         <div className="warp-dialog-body">
-          <span className="kicker kicker--accent">Kontakt</span>
+          <span className="kicker kicker--accent">{t.sections.contact}</span>
           <h2 id="contact-dialog-title" className="warp-dialog-title">
             {title}
           </h2>

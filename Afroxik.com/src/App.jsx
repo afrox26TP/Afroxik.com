@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { getPageData, navSections } from "./lib/content";
+import { LangContext, texts } from "./lib/i18n";
 import { IS_LOW_END, PREFERS_REDUCED_MOTION } from "./lib/device";
 import { useParticles } from "./hooks/useParticles";
 import { useCopy } from "./hooks/useCopy";
@@ -21,7 +22,7 @@ import { WarpOverlayDemo } from "./components/molecule-ui/WarpOverlayDemo";
 
 const PERFORMANCE_STORAGE_KEY = "afrox-performance-mode";
 const CAT_STORAGE_KEY = "afrox-cat";
-const SECTION_IDS = navSections.map((section) => section.id);
+const LANG_STORAGE_KEY = "afrox-lang";
 // Plasma + fonty + data – teprve pak zmizí preloader.
 const READY_SIGNALS = 3;
 
@@ -42,9 +43,23 @@ function readStoredCatEnabled() {
   }
 }
 
+// Adresa /en je vždy anglicky, jinak rozhoduje uložená volba a nakonec jazyk prohlížeče.
+function readInitialLang() {
+  if (/^\/en(\/|$)/.test(window.location.pathname)) return "en";
+  try {
+    const storedLang = window.localStorage.getItem(LANG_STORAGE_KEY);
+    if (storedLang === "cs" || storedLang === "en") return storedLang;
+  } catch {
+    // Ignore storage issues in private browsing or blocked storage contexts.
+  }
+  const languages = navigator.languages?.length ? navigator.languages : [navigator.language];
+  return languages.some((language) => /^(cs|sk)\b/i.test(language ?? "")) ? "cs" : "en";
+}
+
 export default function App() {
   const [performanceMode, setPerformanceMode] = useState(readStoredPerformanceMode);
   const [catEnabled, setCatEnabled] = useState(readStoredCatEnabled);
+  const [lang, setLang] = useState(readInitialLang);
   const [data, setData] = useState(null);
   const [readyCount, setReadyCount] = useState(0);
   const [isPreloading, setIsPreloading] = useState(true);
@@ -64,7 +79,7 @@ export default function App() {
 
   const [copiedKey, copy] = useCopy();
   const heroInView = useInView(heroElement);
-  const activeSection = useActiveSection(SECTION_IDS, Boolean(data));
+  const activeSection = useActiveSection(navSections, Boolean(data));
 
   useEffect(() => {
     const updateViewport = () => setIsCompactViewport(window.innerWidth < 900);
@@ -102,6 +117,26 @@ export default function App() {
       // Ignore storage issues in private browsing or blocked storage contexts.
     }
   }, [catEnabled]);
+
+  const handleLangToggle = useCallback(() => {
+    const next = lang === "cs" ? "en" : "cs";
+    setLang(next);
+    try {
+      window.localStorage.setItem(LANG_STORAGE_KEY, next);
+    } catch {
+      // Ignore storage issues in private browsing or blocked storage contexts.
+    }
+  }, [lang]);
+
+  // Jazyk se propisuje do <html lang>, titulku stránky a adresy (/en pro angličtinu).
+  useEffect(() => {
+    document.documentElement.lang = lang;
+    document.title = texts[lang].title;
+    const path = lang === "en" ? "/en" : "/";
+    if (window.location.pathname !== path) {
+      window.history.replaceState(null, "", `${path}${window.location.search}${window.location.hash}`);
+    }
+  }, [lang]);
 
   // Kočka létá za myší jen na počítači s plnými efekty, jinak sedí na nápisu nebo v rohu.
   const catMode = shouldUseFullFx && !PREFERS_REDUCED_MOTION ? "follow" : "dock";
@@ -153,7 +188,9 @@ export default function App() {
   useParticles(canvasRef, useLowPerformanceMode);
 
   const isContentReady = !isPreloading && Boolean(data);
-  const profile = data?.profile;
+  const t = texts[lang];
+  const profile = data && { ...data.profile, ...t.profile };
+  const sections = navSections.map((id) => ({ id, label: t.sections[id] }));
   const featured = data?.projects.find((project) => project.showcase);
 
   const pageClassName = [
@@ -166,80 +203,83 @@ export default function App() {
     .join(" ");
 
   return (
-    <div className={pageClassName}>
-      <Preloader progress={0.12 + (readyCount / READY_SIGNALS) * 0.72} done={isContentReady} name="Afrox" />
-      <a className="skip-link" href="#projects">
-        Přeskočit na projekty
-      </a>
+    <LangContext.Provider value={t}>
+      <div className={pageClassName}>
+        <Preloader progress={0.12 + (readyCount / READY_SIGNALS) * 0.72} done={isContentReady} name="Afrox" />
+        <a className="skip-link" href="#projects">
+          {t.skipLink}
+        </a>
 
-      <PlasmaBackground
-        color="#4d8fff"
-        speed={0.6}
-        direction="forward"
-        scale={1.1}
-        opacity={1}
-        mouseInteractive={shouldUseFullFx}
-        lowEnd={useLowPerformanceMode}
-        paused={!heroInView}
-        onReady={handlePlasmaReady}
-      />
-      <div className="page-backdrop" aria-hidden="true" />
-      {!useLowPerformanceMode && <canvas ref={canvasRef} className="fx-canvas" aria-hidden="true" />}
-      <ScrollProgress />
+        <PlasmaBackground
+          color="#4d8fff"
+          speed={0.6}
+          direction="forward"
+          scale={1.1}
+          opacity={1}
+          mouseInteractive={shouldUseFullFx}
+          lowEnd={useLowPerformanceMode}
+          paused={!heroInView}
+          onReady={handlePlasmaReady}
+        />
+        <div className="page-backdrop" aria-hidden="true" />
+        {!useLowPerformanceMode && <canvas ref={canvasRef} className="fx-canvas" aria-hidden="true" />}
+        <ScrollProgress />
 
-      <SiteNav
-        name={profile?.name ?? "Afrox"}
-        sections={navSections}
-        active={activeSection}
-        performanceMode={performanceMode}
-        onPerformanceChange={handlePerformanceChange}
-        catEnabled={catEnabled}
-        onCatToggle={handleCatToggle}
-        onContact={openContact}
-      />
+        <SiteNav
+          name={profile?.name ?? "Afrox"}
+          sections={sections}
+          active={activeSection}
+          performanceMode={performanceMode}
+          onPerformanceChange={handlePerformanceChange}
+          catEnabled={catEnabled}
+          onCatToggle={handleCatToggle}
+          onLangToggle={handleLangToggle}
+          onContact={openContact}
+        />
 
-      {data && (
-        <>
-          <main className="site-main" id="main">
-            <Hero ref={setHeroElement} profile={profile} onContact={openContact} />
-            {featured && <Showcase project={featured} lowMotion={lowMotion} />}
-            <Projects
-              projects={data.projects}
-              githubUrl={data.socials.find((social) => social.id === "github")?.href}
-              fullFx={shouldUseFullFx}
-            />
-            <About
+        {data && (
+          <>
+            <main className="site-main" id="main">
+              <Hero ref={setHeroElement} profile={profile} onContact={openContact} />
+              {featured && <Showcase project={featured} lowMotion={lowMotion} />}
+              <Projects
+                projects={data.projects}
+                githubUrl={data.socials.find((social) => social.id === "github")?.href}
+                fullFx={shouldUseFullFx}
+              />
+              <About
+                profile={profile}
+                socials={data.socials}
+                toolbox={data.toolbox}
+                projects={data.projects}
+                copiedKey={copiedKey}
+                onCopy={copy}
+                onContact={openContact}
+              />
+              <Contact socials={data.socials} copiedKey={copiedKey} onCopy={copy} onContact={openContact} />
+            </main>
+
+            <SiteFooter
               profile={profile}
-              socials={data.socials}
-              toolbox={data.toolbox}
+              sections={sections}
               projects={data.projects}
+              socials={data.socials}
               copiedKey={copiedKey}
               onCopy={copy}
               onContact={openContact}
             />
-            <Contact socials={data.socials} copiedKey={copiedKey} onCopy={copy} onContact={openContact} />
-          </main>
 
-          <SiteFooter
-            profile={profile}
-            sections={navSections}
-            projects={data.projects}
-            socials={data.socials}
-            copiedKey={copiedKey}
-            onCopy={copy}
-            onContact={openContact}
-          />
+            {/* Schovaná kočka nezmizí – odletí do loga v navigaci a tancuje tam. */}
+            <CatBuddy mode={catMode} animate={!lowMotion} home={!catEnabled} />
 
-          {/* Schovaná kočka nezmizí – odletí do loga v navigaci a tancuje tam. */}
-          <CatBuddy mode={catMode} animate={!lowMotion} home={!catEnabled} />
-
-          <WarpDialog open={contactOpen} onOpenChange={setContactOpen}>
-            <WarpDialogContent>
-              <WarpOverlayDemo socials={data.socials} copiedKey={copiedKey} onCopy={copy} />
-            </WarpDialogContent>
-          </WarpDialog>
-        </>
-      )}
-    </div>
+            <WarpDialog open={contactOpen} onOpenChange={setContactOpen}>
+              <WarpDialogContent title={t.contactMe} description={t.dialog.description}>
+                <WarpOverlayDemo socials={data.socials} copiedKey={copiedKey} onCopy={copy} />
+              </WarpDialogContent>
+            </WarpDialog>
+          </>
+        )}
+      </div>
+    </LangContext.Provider>
   );
 }

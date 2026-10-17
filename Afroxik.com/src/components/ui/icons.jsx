@@ -132,6 +132,15 @@ export function IconCat(props) {
   );
 }
 
+export function IconGlobe(props) {
+  return (
+    <Stroke {...props}>
+      <circle cx="12" cy="12" r="9" />
+      <path d="M3 12h18M12 3a14 14 0 0 1 0 18M12 3a14 14 0 0 0 0 18" />
+    </Stroke>
+  );
+}
+
 export function IconGamepad(props) {
   return (
     <Stroke {...props}>

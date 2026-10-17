@@ -1,8 +1,10 @@
 import { useEffect, useRef } from "react";
 import { IconArrowUpRight } from "../ui/icons";
+import { useT } from "../../lib/i18n";
 
 // Screenshot hlavního projektu, který se při scrollu „narovná“ ze 3D náklonu (inspirace Streamally).
 export default function Showcase({ project, lowMotion }) {
+  const t = useT();
   const sectionRef = useRef(null);
   const cardRef = useRef(null);
   const { showcase } = project;
@@ -75,7 +77,7 @@ export default function Showcase({ project, lowMotion }) {
               sizes="(min-width: 1140px) 1060px, 94vw"
               width={showcase.width}
               height={showcase.height}
-              alt={`${project.title} – screenshot ze hry`}
+              alt={`${project.title} – ${t.showcase.screenshot}`}
               decoding="async"
             />
           </div>
@@ -83,13 +85,13 @@ export default function Showcase({ project, lowMotion }) {
 
         <div className="showcase__caption">
           <div>
-            <span className="kicker kicker--accent">{showcase.kicker}</span>
+            <span className="kicker kicker--accent">{t.showcase.kicker}</span>
             <h2 id="showcase-title" className="showcase__title">
               {project.title}
             </h2>
             {project.description && <p className="showcase__desc">{project.description}</p>}
           </div>
-          <ul className="tag-list" aria-label="Technologie" style={{ "--accent-a": project.accent[0] }}>
+          <ul className="tag-list" aria-label={t.tech} style={{ "--accent-a": project.accent[0] }}>
             {project.tags.map((tag) => (
               <li key={tag} className="tag">
                 {tag}

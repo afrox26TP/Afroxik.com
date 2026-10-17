@@ -1,0 +1,143 @@
+import { createContext, useContext } from "react";
+
+// Všechny texty webu v obou jazycích. Popisy projektů jdou z GitHubu tak, jak jsou, nepřekládají se.
+export const texts = {
+  cs: {
+    title: "Afrox — projekty, hry a vývojové experimenty",
+    skipLink: "Přeskočit na projekty",
+    sections: { projects: "Projekty", about: "O mně", contact: "Kontakt" },
+    contactMe: "Napiš mi",
+    allContacts: "Všechny kontakty",
+    copy: "zkopírovat",
+    copied: "Zkopírováno!",
+    backToTop: "zpět nahoru",
+    tech: "Technologie",
+    profile: {
+      role: "Student · Vývojář · Gamer",
+      tagline: ["Projekty, aplikace, hry", "a vývojové experimenty."],
+      intro: "Pan_Majitel. Nezlob Kote v bote, vidim te kolacku.",
+      bio: "Student, vývojář a nadšenec do technologií a her. Píšu v Godotu, Pythonu i JavaScriptu – od tahové grand strategy přes scrapery až po weby a AI experimenty.",
+    },
+    preloader: { label: "Načítání stránky", title: "Loaduju" },
+    nav: {
+      label: "Hlavní navigace",
+      perf: "Výkon efektů",
+      catHide: "Schovat kočku do loga",
+      catShow: "Pustit kočku ven",
+      catOut: "Kočka: venku",
+      catHome: "Kočka: v logu",
+      menuOpen: "Otevřít menu",
+      menuClose: "Zavřít menu",
+      // Přepínač ukazuje jazyk, na který se přepne.
+      langSwitch: { lang: "en", short: "EN", name: "English", label: "Switch to English" },
+    },
+    hero: { projects: "mrkni, co stavím", contact: "napiš mi" },
+    showcase: { kicker: "Featured · Ročníková práce", screenshot: "screenshot ze hry" },
+    projects: {
+      kicker: "Další projekty",
+      title: ["Na čem jsem", "makal."],
+      lead: "Hry v Godotu, weby v JavaScriptu, scrapery a AI experimenty v Pythonu. Karta tě hodí rovnou na GitHub.",
+      open: "Otevřít",
+      empty: "Projekty se teď nepodařilo načíst z GitHubu. Najdeš je přímo na mém profilu.",
+    },
+    about: {
+      title: ["Kdo za tím", "stojí."],
+      stats: ["projektů v portfoliu", "nástrojů v toolboxu", "na GitHubu od roku"],
+      joinTag: "player_02 · ty?",
+      joinRole: "Volný slot",
+      joinName: "Pojď do party",
+      joinMeta: "Hry · Weby · AI",
+      joinBio: "Máš nápad na hru, web nebo AI bota? Nebo chceš jen probrat projekt? Napiš mi.",
+      joinCta: "Napsat zprávu",
+      toolbox: "Jazyky a nástroje, které se v mých projektech točí nejvíc.",
+    },
+    contact: {
+      title: ["Ozvi se.", "Jedno tlačítko, všechny kanály."],
+      discord: "Discord · klikni a zkopíruj",
+      copyDiscord: "Zkopírovat Discord",
+    },
+    dialog: { description: "Vyber si kanál a napiš mi napřímo.", close: "Zavřít kontakty" },
+    footer: {
+      sections: "Sekce",
+      navigation: "Navigace",
+      projects: "Vybrané projekty",
+      socialsLabel: "Sociální sítě",
+      socials: "Sítě",
+      built: "Postaveno v Reactu, Vite a WebGL.",
+      toTop: "Nahoru",
+    },
+    cat: { label: "Kočka – pustit písničku Dam dam didi didi", hint: "klikni na mě ♪" },
+  },
+
+  en: {
+    title: "Afrox — projects, games and dev experiments",
+    skipLink: "Skip to projects",
+    sections: { projects: "Projects", about: "About", contact: "Contact" },
+    contactMe: "Message me",
+    allContacts: "All contacts",
+    copy: "copy",
+    copied: "Copied!",
+    backToTop: "back to top",
+    tech: "Technologies",
+    profile: {
+      role: "Student · Developer · Gamer",
+      tagline: ["Projects, apps, games", "and dev experiments."],
+      intro: "Mr_Owner. Behave, Puss in Boots, I see you, cupcake.",
+      bio: "Student, developer and tech and gaming enthusiast. I build in Godot, Python and JavaScript – from a turn-based grand strategy to scrapers, websites and AI experiments.",
+    },
+    preloader: { label: "Loading page", title: "Loading" },
+    nav: {
+      label: "Main navigation",
+      perf: "Effects performance",
+      catHide: "Hide the cat in the logo",
+      catShow: "Let the cat out",
+      catOut: "Cat: out",
+      catHome: "Cat: in the logo",
+      menuOpen: "Open menu",
+      menuClose: "Close menu",
+      langSwitch: { lang: "cs", short: "CZ", name: "Čeština", label: "Přepnout do češtiny" },
+    },
+    hero: { projects: "see what I'm building", contact: "message me" },
+    showcase: { kicker: "Featured · School project", screenshot: "game screenshot" },
+    projects: {
+      kicker: "More projects",
+      title: ["What I've been", "building."],
+      lead: "Games in Godot, websites in JavaScript, scrapers and AI experiments in Python. Each card takes you straight to GitHub.",
+      open: "Open",
+      empty: "Couldn't load the projects from GitHub right now. You'll find them on my profile.",
+    },
+    about: {
+      title: ["Who's", "behind it."],
+      stats: ["projects in the portfolio", "tools in the toolbox", "on GitHub since"],
+      joinTag: "player_02 · you?",
+      joinRole: "Open slot",
+      joinName: "Join the party",
+      joinMeta: "Games · Web · AI",
+      joinBio: "Got an idea for a game, a website or an AI bot? Or just want to talk through a project? Message me.",
+      joinCta: "Send a message",
+      toolbox: "Languages and tools that show up most in my projects.",
+    },
+    contact: {
+      title: ["Get in touch.", "One button, every channel."],
+      discord: "Discord · click to copy",
+      copyDiscord: "Copy Discord",
+    },
+    dialog: { description: "Pick a channel and message me directly.", close: "Close contacts" },
+    footer: {
+      sections: "Sections",
+      navigation: "Navigation",
+      projects: "Selected projects",
+      socialsLabel: "Social networks",
+      socials: "Socials",
+      built: "Built with React, Vite and WebGL.",
+      toTop: "Back to top",
+    },
+    cat: { label: "Cat – play the Dam dam didi didi song", hint: "click me ♪" },
+  },
+};
+
+export const LangContext = createContext(texts.cs);
+
+export function useT() {
+  return useContext(LangContext);
+}

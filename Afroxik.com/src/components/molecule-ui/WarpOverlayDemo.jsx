@@ -1,6 +1,9 @@
 import { IconArrowUpRight, IconCheck, IconCopy, socialIcons } from "../ui/icons";
+import { useT } from "../../lib/i18n";
 
 export function WarpOverlayDemo({ socials, copiedKey, onCopy }) {
+  const t = useT();
+
   return (
     <ul className="warp-contact-grid">
       {socials.map((social) => {
@@ -29,11 +32,11 @@ export function WarpOverlayDemo({ socials, copiedKey, onCopy }) {
                 type="button"
                 className={`warp-contact-link${copied ? " is-copied" : ""}`}
                 onClick={() => onCopy(social.copy, `dialog-${social.id}`)}
-                aria-label={`${social.label}: ${social.handle} – zkopírovat`}
+                aria-label={`${social.label}: ${social.handle} – ${t.copy}`}
               >
                 {content}
                 <span className="warp-contact-toast" role="status">
-                  {copied ? "Zkopírováno!" : ""}
+                  {copied ? t.copied : ""}
                 </span>
               </button>
             ) : (
