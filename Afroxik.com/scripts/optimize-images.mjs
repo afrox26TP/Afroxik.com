@@ -30,6 +30,12 @@ const sources = [
     output: path.join(outputDir, "project-muzeer.webp"),
     width: 1200,
   },
+  {
+    input: path.join(outputDir, "rp-2025-26.png"),
+    output: path.join(outputDir, "rp-2025-26.webp"),
+    width: 1800,
+    quality: 84,
+  },
 ];
 
 await fs.mkdir(outputDir, { recursive: true });
@@ -40,7 +46,7 @@ for (const file of sources) {
 
   await sharp(file.input)
     .resize({ width: resizeWidth, withoutEnlargement: true })
-    .webp({ quality: 90, effort: 6 })
+    .webp({ quality: file.quality ?? 90, effort: 6 })
     .toFile(file.output);
 
   const [srcStat, outStat] = await Promise.all([fs.stat(file.input), fs.stat(file.output)]);

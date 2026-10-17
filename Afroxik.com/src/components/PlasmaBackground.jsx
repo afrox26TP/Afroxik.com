@@ -92,15 +92,24 @@ export default function PlasmaBackground({
   opacity = 0.8,
   mouseInteractive = true,
   lowEnd = false,
+  paused = false,
   onReady,
 }) {
   const containerRef = useRef(null);
   const onReadyRef = useRef(onReady);
+  const pausedRef = useRef(paused);
+  const syncPauseRef = useRef(null);
   const [isSupported, setIsSupported] = useState(true);
 
   useEffect(() => {
     onReadyRef.current = onReady;
   }, [onReady]);
+
+  // Pauza bez nového WebGL kontextu – např. když je hero sekce mimo obrazovku.
+  useEffect(() => {
+    pausedRef.current = paused;
+    syncPauseRef.current?.();
+  }, [paused]);
 
   const directionMultiplier = useMemo(() => {
     if (direction === "reverse") return -1;
@@ -130,7 +139,7 @@ export default function PlasmaBackground({
     let renderer;
     let program;
     let handleMouseMove;
-    let isPaused = document.hidden;
+    let isPaused = document.hidden || pausedRef.current;
     let active = true;
 
     try {
@@ -191,8 +200,9 @@ export default function PlasmaBackground({
       mouse[1] = event.clientY - rectTop;
     };
 
+    // Kontejner má pointer-events: none, proto posloucháme na window.
     if (mouseInteractive) {
-      container.addEventListener("mousemove", handleMouseMove, { passive: true });
+      window.addEventListener("pointermove", handleMouseMove, { passive: true });
     }
 
     const setSize = () => {
@@ -243,8 +253,8 @@ export default function PlasmaBackground({
       if (!raf) raf = requestAnimationFrame(loop);
     };
 
-    const handleVisibilityChange = () => {
-      isPaused = document.hidden;
+    const syncPause = () => {
+      isPaused = document.hidden || pausedRef.current;
       if (isPaused) {
         if (raf) cancelAnimationFrame(raf);
         raf = 0;
@@ -252,18 +262,26 @@ export default function PlasmaBackground({
         raf = requestAnimationFrame(loop);
       }
     };
+    syncPauseRef.current = syncPause;
 
-    document.addEventListener("visibilitychange", handleVisibilityChange);
+    document.addEventListener("visibilitychange", syncPause);
 
-    raf = requestAnimationFrame(loop);
+    // První snímek vykreslíme vždy, ať pod obsahem není prázdné plátno.
+    raf = requestAnimationFrame((now) => {
+      raf = 0;
+      program.uniforms.iTime.value = (now - t0) * 0.001;
+      renderer.render({ scene: mesh });
+      if (!isPaused) raf = requestAnimationFrame(loop);
+    });
 
     return () => {
       active = false;
+      syncPauseRef.current = null;
       cancelAnimationFrame(raf);
       cleanupResize();
-      document.removeEventListener("visibilitychange", handleVisibilityChange);
+      document.removeEventListener("visibilitychange", syncPause);
       if (mouseInteractive && handleMouseMove) {
-        container.removeEventListener("mousemove", handleMouseMove);
+        window.removeEventListener("pointermove", handleMouseMove);
       }
       try {
         container.removeChild(canvas);

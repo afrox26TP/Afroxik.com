@@ -1,7 +1,10 @@
 import React from "react";
 import { createPortal } from "react-dom";
+import { IconClose } from "../ui/icons";
 
 const WarpDialogContext = React.createContext(null);
+
+const FOCUSABLE = 'a[href], button:not([disabled]), input:not([disabled]), textarea, select, [tabindex]:not([tabindex="-1"])';
 
 function useWarpDialogContext() {
   const context = React.useContext(WarpDialogContext);
@@ -9,20 +12,30 @@ function useWarpDialogContext() {
   return context;
 }
 
-export function WarpDialog({ children }) {
-  const [open, setOpen] = React.useState(false);
-  const triggerRef = React.useRef(null);
-  const value = React.useMemo(() => ({ open, setOpen, triggerRef }), [open]);
+// Funguje řízeně (open + onOpenChange) i neřízeně (WarpDialogTrigger).
+export function WarpDialog({ open: openProp, onOpenChange, children }) {
+  const [uncontrolledOpen, setUncontrolledOpen] = React.useState(false);
+  const isControlled = openProp !== undefined;
+  const open = isControlled ? openProp : uncontrolledOpen;
+
+  const setOpen = React.useCallback(
+    (next) => {
+      if (!isControlled) setUncontrolledOpen(next);
+      onOpenChange?.(next);
+    },
+    [isControlled, onOpenChange],
+  );
+
+  const value = React.useMemo(() => ({ open, setOpen }), [open, setOpen]);
 
   return <WarpDialogContext.Provider value={value}>{children}</WarpDialogContext.Provider>;
 }
 
 export function WarpDialogTrigger({ asChild = false, children }) {
-  const { setOpen, triggerRef } = useWarpDialogContext();
+  const { setOpen } = useWarpDialogContext();
 
   if (asChild && React.isValidElement(children)) {
     return React.cloneElement(children, {
-      ref: triggerRef,
       "aria-haspopup": "dialog",
       onClick: (event) => {
         children.props.onClick?.(event);
@@ -32,35 +45,54 @@ export function WarpDialogTrigger({ asChild = false, children }) {
   }
 
   return (
-    <button ref={triggerRef} type="button" aria-haspopup="dialog" onClick={() => setOpen(true)}>
+    <button type="button" aria-haspopup="dialog" onClick={() => setOpen(true)}>
       {children}
     </button>
   );
 }
 
-export function WarpDialogContent({ children }) {
-  const { open, setOpen, triggerRef } = useWarpDialogContext();
+export function WarpDialogContent({ title = "Napiš mi", description = "Vyber si kanál a napiš mi napřímo.", children }) {
+  const { open, setOpen } = useWarpDialogContext();
   const panelRef = React.useRef(null);
 
   React.useEffect(() => {
     if (!open) return undefined;
 
+    const returnFocusTo = document.activeElement;
     const previousOverflow = document.body.style.overflow;
-    const triggerElement = triggerRef.current;
+
     const onKeyDown = (event) => {
-      if (event.key === "Escape") setOpen(false);
+      if (event.key === "Escape") {
+        setOpen(false);
+        return;
+      }
+      if (event.key !== "Tab" || !panelRef.current) return;
+
+      // Fokus zůstává uvnitř dialogu.
+      const focusable = [...panelRef.current.querySelectorAll(FOCUSABLE)];
+      if (!focusable.length) return;
+      const first = focusable[0];
+      const last = focusable[focusable.length - 1];
+      if (event.shiftKey && (document.activeElement === first || document.activeElement === panelRef.current)) {
+        event.preventDefault();
+        last.focus();
+      } else if (!event.shiftKey && document.activeElement === last) {
+        event.preventDefault();
+        first.focus();
+      }
     };
 
     document.body.style.overflow = "hidden";
     document.addEventListener("keydown", onKeyDown);
-    requestAnimationFrame(() => panelRef.current?.focus());
+    const raf = requestAnimationFrame(() => panelRef.current?.focus());
 
     return () => {
+      cancelAnimationFrame(raf);
       document.body.style.overflow = previousOverflow;
       document.removeEventListener("keydown", onKeyDown);
-      triggerElement?.focus?.();
+      returnFocusTo?.focus?.();
     };
-  }, [open, setOpen, triggerRef]);
+  }, [open, setOpen]);
 
   if (!open) return null;
 
@@ -70,6 +102,7 @@ export function WarpDialogContent({ children }) {
         type="button"
         className="warp-dialog-backdrop"
         aria-label="Zavřít kontakty"
+        tabIndex={-1}
         onClick={() => setOpen(false)}
       />
       <div
@@ -78,20 +111,21 @@ export function WarpDialogContent({ children }) {
         role="dialog"
         aria-modal="true"
         aria-labelledby="contact-dialog-title"
+        aria-describedby="contact-dialog-copy"
         tabIndex={-1}
       >
         <div className="warp-dialog-chrome" aria-hidden="true" />
-        <button
-          type="button"
-          className="warp-dialog-close"
-          aria-label="Zavřít kontakty"
-          onClick={() => setOpen(false)}
-        >
-          ×
+        <button type="button" className="warp-dialog-close" aria-label="Zavřít kontakty" onClick={() => setOpen(false)}>
+          <IconClose />
         </button>
         <div className="warp-dialog-body">
-          <h2 id="contact-dialog-title" className="warp-dialog-title">Contact me</h2>
-          <p className="warp-dialog-copy">Choose a channel and write to me directly.</p>
+          <span className="kicker kicker--accent">Kontakt</span>
+          <h2 id="contact-dialog-title" className="warp-dialog-title">
+            {title}
+          </h2>
+          <p id="contact-dialog-copy" className="warp-dialog-copy">
+            {description}
+          </p>
           {children}
         </div>
       </div>
