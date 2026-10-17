@@ -226,7 +226,8 @@ export default function App() {
             onContact={openContact}
           />
 
-          {catEnabled && <CatBuddy mode={catMode} animate={!lowMotion} />}
+          {/* Schovaná kočka nezmizí – odletí do loga v navigaci a tancuje tam. */}
+          <CatBuddy mode={catMode} animate={!lowMotion} home={!catEnabled} />
 
           <WarpDialog open={contactOpen} onOpenChange={setContactOpen}>
             <WarpDialogContent>

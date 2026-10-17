@@ -38,7 +38,9 @@ Projekt nepoužívá databázi ani serverový backend.
 
 Létající kamarád: `Afroxik.com/src/components/site/CatBuddy.jsx`, média v `Afroxik.com/public/media/`.
 Video má zelené pozadí, které se klíčuje až v prohlížeči (WebGL shader), takže stačí jedno MP4.
-Návštěvník kočku vypne tlačítkem s kočkou v navigaci.
+Tlačítkem s kočkou v navigaci ji návštěvník schová: odletí do loga a tancuje tam. Když lítá venku,
+je v logu jen její šedá silueta (`SiteNav.jsx`, `.brand__home`).
+Stejná kočka je i favicon: `Afroxik.com/public/favicon.ico` (hlava, 16/32/48 px) a `apple-touch-icon.png` (180 px).
 
 Přegenerování videa z greenscreen šablony (1080p, kočka v oblasti x 992–1520, y 268–860):
 

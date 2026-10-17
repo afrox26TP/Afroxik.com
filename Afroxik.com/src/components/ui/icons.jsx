@@ -141,7 +141,7 @@ export function IconGamepad(props) {
   );
 }
 
-// Tečkové „A“ ve stylu písma Doto – stejný motiv jako favicon.
+// Tečkové „A“ ve stylu písma Doto.
 const BRAND_DOTS = [
   [12, 8], [16, 8], [20, 8],
   [8, 12], [24, 12],
@@ -150,7 +150,8 @@ const BRAND_DOTS = [
   [8, 24], [24, 24],
 ];
 
-export function BrandMark({ className = "", ...props }) {
+// letter={false} vykreslí jen rámeček (v navigaci v něm bydlí kočka).
+export function BrandMark({ className = "", letter = true, ...props }) {
   const gradientId = `brand-${useId().replace(/[^a-zA-Z0-9_-]/g, "")}`;
   return (
     <svg viewBox="0 0 32 32" className={className} aria-hidden="true" focusable="false" {...props}>
@@ -162,11 +163,13 @@ export function BrandMark({ className = "", ...props }) {
       </defs>
       <rect width="32" height="32" rx="9" fill="#071330" />
       <rect x="0.75" y="0.75" width="30.5" height="30.5" rx="8.25" fill="none" stroke={`url(#${gradientId})`} strokeOpacity="0.6" strokeWidth="1.5" />
-      <g fill={`url(#${gradientId})`}>
-        {BRAND_DOTS.map(([cx, cy]) => (
-          <circle key={`${cx}-${cy}`} cx={cx} cy={cy} r="1.65" />
-        ))}
-      </g>
+      {letter && (
+        <g fill={`url(#${gradientId})`}>
+          {BRAND_DOTS.map(([cx, cy]) => (
+            <circle key={`${cx}-${cy}`} cx={cx} cy={cy} r="1.65" />
+          ))}
+        </g>
+      )}
     </svg>
   );
 }

@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import LetterSwap from "../ui/LetterSwap";
 import PerformanceToggle from "../ui/PerformanceToggle";
 import { BrandMark, IconCat, IconClose, IconMenu } from "../ui/icons";
+import { CAT_POSTER_SRC } from "../../lib/cat";
 
 // Plovoucí „pill“ navigace se skleněným pozadím (inspirace Streamally + Komunita).
 export default function SiteNav({
@@ -56,7 +57,11 @@ export default function SiteNav({
       <header className={`site-nav${scrolled ? " is-scrolled" : ""}${menuOpen ? " is-menu-open" : ""}`}>
         <nav className="site-nav__inner" aria-label="Hlavní navigace">
           <a href="#top" className="brand" onClick={closeMenu} aria-label={`${name} – zpět nahoru`}>
-            <BrandMark className="brand__mark" />
+            {/* Domeček kočky: šedá silueta, dokud kočka lítá venku; schovaná sem přiletí a tancuje. */}
+            <span className="brand__home" data-cat={catEnabled ? "out" : "home"}>
+              <BrandMark className="brand__frame" letter={false} />
+              <img className="brand__ghost" src={CAT_POSTER_SRC} alt="" width="360" height="400" data-cat-home="" />
+            </span>
             <span className="brand__name" aria-hidden="true">
               {name}
             </span>
@@ -82,8 +87,8 @@ export default function SiteNav({
               type="button"
               className="cat-toggle"
               aria-pressed={catEnabled}
-              aria-label={catEnabled ? "Schovat kočku" : "Ukázat kočku"}
-              title={catEnabled ? "Schovat kočku" : "Ukázat kočku"}
+              aria-label={catEnabled ? "Schovat kočku do loga" : "Pustit kočku ven"}
+              title={catEnabled ? "Schovat kočku do loga" : "Pustit kočku ven"}
               onClick={onCatToggle}
             >
               <IconCat />
@@ -122,7 +127,7 @@ export default function SiteNav({
           </ul>
           <PerformanceToggle value={performanceMode} onChange={onPerformanceChange} />
           <button type="button" className="cat-toggle cat-toggle--wide" aria-pressed={catEnabled} onClick={onCatToggle}>
-            <IconCat /> {catEnabled ? "Kočka: zapnutá" : "Kočka: vypnutá"}
+            <IconCat /> {catEnabled ? "Kočka: venku" : "Kočka: v logu"}
           </button>
           <button type="button" className="nav-cta nav-cta--lg" onClick={handleContact}>
             Napiš mi

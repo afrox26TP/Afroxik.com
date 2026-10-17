@@ -680,6 +680,53 @@ section[id] {
   filter: drop-shadow(0 0 10px rgba(89, 168, 255, 0.45));
 }
 
+/* Domeček kočky v logu: šedá silueta, když kočka lítá venku. Schovaná kočka (CatBuddy)
+   přistane přesně na siluetu – ta má stejný výřez jako video. */
+.brand__home {
+  --ghost-w: 30px;
+  position: relative;
+  width: 30px;
+  height: 30px;
+  flex-shrink: 0;
+}
+
+.brand__frame {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  filter: drop-shadow(0 0 10px rgba(89, 168, 255, 0.45));
+  transition: filter 400ms ease;
+}
+
+.brand__ghost {
+  position: absolute;
+  bottom: 1px;
+  left: calc(50% - var(--ghost-w) / 2);
+  width: var(--ghost-w);
+  max-width: none;
+  height: auto;
+  aspect-ratio: 360 / 400;
+  filter: grayscale(1) brightness(0.95);
+  opacity: 0.45;
+  pointer-events: none;
+  transition: opacity 300ms ease 150ms;
+}
+
+.brand:hover .brand__ghost {
+  opacity: 0.7;
+}
+
+/* Silueta zmizí až pod přistávající kočkou. */
+.brand__home[data-cat="home"] .brand__ghost {
+  opacity: 0;
+  transition-delay: 750ms;
+}
+
+.brand__home[data-cat="home"] .brand__frame {
+  filter: drop-shadow(0 0 12px rgba(124, 236, 255, 0.6));
+}
+
 .brand__name {
   font-family: var(--font-display);
   font-weight: 800;
@@ -2246,6 +2293,20 @@ section[id] {
   opacity: 1;
 }
 
+/* Do loga a zpátky letí nad navigací (jinak je pod jejím sklem). */
+.cat-buddy[data-layer="top"] {
+  z-index: 75;
+}
+
+.cat-buddy.is-home {
+  pointer-events: none;
+}
+
+.cat-buddy.is-home .cat-buddy__bubble,
+.cat-buddy.is-home .cat-buddy__notes {
+  display: none;
+}
+
 .cat-buddy:focus-visible {
   outline: 2px solid var(--cyan);
   outline-offset: 4px;
@@ -2780,5 +2841,10 @@ section[id] {
   .is-ready .cat-buddy__scale,
   .cat-buddy.is-playing .cat-buddy__notes i {
     animation: none;
+  }
+
+  .brand__ghost,
+  .brand__frame {
+    transition: none;
   }
 }
