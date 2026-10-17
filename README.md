@@ -29,7 +29,7 @@ Produkční výstup vznikne v `dist/`.
 - Projekty: veřejná repa z GitHubu, prohlížeč je načítá přes GitHub API (bez tokenu, s 10min cache v localStorage).
   Název, popis, jazyk, topics, web (pole Website) a čas posledního pushe se berou z GitHubu. Stránka na GitHub
   nečeká: hned ukáže projekty z minulé návštěvy a čerstvé doplní, až dorazí. V `content.js` jde repo skrýt (`hiddenRepos`),
-  přidat repo z cizího účtu (`extraRepos`) a vybrat to, které se ukáže jako velký 3D screenshot
+  přidat repo z cizího účtu (`extraRepos`), doplnit web, který GitHub nemá (`homepages`), a vybrat to, které se ukáže jako velký 3D screenshot
   pod úvodem (`featured`).
 - Meta tagy a náhled pro sdílení odkazu: `index.html` a `Afroxik.com/public/og-image.jpg` (1200×630).
   Anglickou kopii pro `/en` (`en.html`) vyrobí build podle `englishMeta` ve `vite.config.js`.

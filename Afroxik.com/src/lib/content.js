@@ -25,6 +25,13 @@ const hiddenRepos = ["afrox26TP"];
 // Repa z cizích účtů, na kterých jsem dělal. Mezi mými je GitHub nevrátí, proto se načtou zvlášť.
 const extraRepos = ["BugHunter34/Muzeer", "BugHunter34/OpusCode"];
 
+// Weby projektů, které GitHub nevrací (prázdné pole Website, u cizích rep ho nejde vyplnit). Mají přednost před GitHubem.
+const homepages = {
+  OpusCode: "https://opuscode.dev",
+  Muzeer: "https://muzeer.com",
+  Sauto_Scrapper: "https://autoidx.cz",
+};
+
 // Repo, které se ukáže jako velký 3D screenshot pod úvodem. Texty bere z GitHubu, screenshot je lokální,
 // nadpis nad ním je v i18n.js (showcase.kicker).
 const featured = {
@@ -120,6 +127,7 @@ function decorate(projects) {
     .filter((project) => !hiddenRepos.includes(project.id))
     .map((project, index) => ({
       ...project,
+      homepage: homepages[project.id] ?? project.homepage,
       accent: accents[index % accents.length],
       showcase: project.id === featured.repo ? featured : undefined,
     }));
