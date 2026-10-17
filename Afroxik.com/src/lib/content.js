@@ -1,6 +1,6 @@
 // Data webu – kontakty, toolbox a projekty z GitHubu. Texty v obou jazycích jsou v i18n.js.
 
-const profile = {
+export const profile = {
   name: "Afrox",
   handle: "afrox26TP",
   githubSince: 2022,
@@ -10,14 +10,14 @@ const profile = {
 };
 
 // Discord nemá veřejnou URL podle jména, proto se handle kopíruje do schránky.
-const socials = [
+export const socials = [
   { id: "discord", label: "Discord", handle: "afrox26TPV2", copy: "afrox26TPV2" },
   { id: "github", label: "GitHub", handle: "afrox26TP", href: "https://github.com/afrox26TP" },
   { id: "instagram", label: "Instagram", handle: "Tomi", href: "https://www.instagram.com/tomik62pt/" },
   { id: "steam", label: "Steam", handle: "afrox26tp", href: "https://steamcommunity.com/id/1234dg7548/" },
 ];
 
-const toolbox = ["Godot", "GDScript", "Python", "Scrapy", "JavaScript", "React", "Vite", "WebGL", "CSS", "Git"];
+export const toolbox = ["Godot", "GDScript", "Python", "Scrapy", "JavaScript", "React", "Vite", "WebGL", "CSS", "Git"];
 
 // Projekty = veřejná repa z GitHubu, nejnověji pushnutá první. Profilové README není projekt.
 const hiddenRepos = ["afrox26TP"];
@@ -47,9 +47,16 @@ const accents = [
 
 const REPOS_URL = `https://api.github.com/users/${profile.handle}/repos?per_page=100&sort=pushed`;
 // Klíč obsahuje cizí repa, takže se změna jejich seznamu projeví hned, ne až po vypršení cache.
-const REPOS_CACHE_KEY = `afrox-github-repos-v1:${extraRepos}`;
+// Verze v klíči se zvedá, když se změní tvar uložených projektů (toProject).
+const REPOS_CACHE_KEY = `afrox-github-repos-v2:${extraRepos}`;
 // GitHub bez tokenu povolí 60 dotazů za hodinu z jedné IP, proto si prohlížeč seznam chvíli pamatuje.
 const REPOS_CACHE_MS = 10 * 60 * 1000;
+
+// Web z GitHubu (pole Website) bývá i bez https:// nebo prázdný. Jiné schéma než http(s) do odkazu nepustíme.
+function toHomepage(url) {
+  if (!url) return null;
+  return /^https?:\/\//i.test(url) ? url : `https://${url}`;
+}
 
 function toProject(repo) {
   return {
@@ -57,9 +64,11 @@ function toProject(repo) {
     title: repo.name,
     repo: repo.full_name,
     url: repo.html_url,
+    homepage: toHomepage(repo.homepage),
     description: repo.description,
     tags: [repo.language, ...(repo.topics ?? [])].filter(Boolean),
     year: new Date(repo.created_at).getFullYear(),
+    pushedAt: repo.pushed_at,
   };
 }
 
@@ -106,20 +115,23 @@ async function loadRepos() {
 // Id sekcí v pořadí navigace, popisky jsou v i18n.js (sections).
 export const navSections = ["projects", "about", "contact"];
 
-export async function getPageData() {
-  const projects = (await loadRepos())
+function decorate(projects) {
+  return projects
     .filter((project) => !hiddenRepos.includes(project.id))
     .map((project, index) => ({
       ...project,
       accent: accents[index % accents.length],
       showcase: project.id === featured.repo ? featured : undefined,
     }));
+}
 
-  return {
-    profile,
-    socials,
-    toolbox,
-    projects,
-    source: "github",
-  };
+// Projekty z minulé návštěvy (klidně starší než 10 minut), aby stránka nemusela čekat na GitHub. Null = žádné.
+export function getCachedProjects() {
+  const cached = readCachedRepos();
+  return cached && decorate(cached.repos);
+}
+
+// Čerstvé projekty z GitHubu. Při výpadku vrátí uložené, nebo prázdný seznam.
+export async function getProjects() {
+  return decorate(await loadRepos());
 }

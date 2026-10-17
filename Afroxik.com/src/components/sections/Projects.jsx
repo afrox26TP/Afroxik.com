@@ -9,6 +9,19 @@ function breakable(title) {
   return parts.flatMap((part, index) => (index < parts.length - 1 ? [part, <wbr key={index} />] : [part]));
 }
 
+// Kdy byl projekt naposledy pushnutý, slovy („před 3 dny“, „včera“).
+const AGE_UNITS = [
+  ["year", 365],
+  ["month", 30],
+  ["week", 7],
+];
+
+function timeAgo(date, locale) {
+  const days = (Date.parse(date) - Date.now()) / 86400000;
+  const [unit, size] = AGE_UNITS.find(([, size]) => -days >= size) ?? ["day", 1];
+  return new Intl.RelativeTimeFormat(locale, { numeric: "auto" }).format(Math.round(days / size), unit);
+}
+
 // Světelný kužel sleduje kurzor nad kartou (inspirace Streamally).
 function trackSpotlight(event) {
   const card = event.target.closest?.(".project-card");
@@ -22,13 +35,7 @@ function ProjectCard({ project }) {
   const t = useT();
 
   return (
-    <a
-      className="project-card"
-      href={project.url}
-      target="_blank"
-      rel="noreferrer"
-      style={{ "--accent-a": project.accent[0], "--accent-b": project.accent[1] }}
-    >
+    <article className="project-card" style={{ "--accent-a": project.accent[0], "--accent-b": project.accent[1] }}>
       <span className="project-card__glow" aria-hidden="true" />
       {project.image && (
         <div className="project-card__media">
@@ -47,8 +54,18 @@ function ProjectCard({ project }) {
           <span className="project-card__repo-name">{project.repo}</span>
           <span className="project-card__year">{project.year}</span>
         </span>
-        <h3 className="project-card__title">{breakable(project.title)}</h3>
+        <h3 className="project-card__title">
+          {/* Odkaz na GitHub pokrývá přes ::after celou kartu, tlačítko Web leží nad ním. */}
+          <a className="project-card__link" href={project.url} target="_blank" rel="noreferrer">
+            {breakable(project.title)}
+          </a>
+        </h3>
         {project.description && <p className="project-card__desc">{project.description}</p>}
+        {project.pushedAt && (
+          <time className="project-card__updated" dateTime={project.pushedAt}>
+            {t.projects.updated} {timeAgo(project.pushedAt, t.locale)}
+          </time>
+        )}
         <div className="project-card__foot">
           <ul className="tag-list" aria-label={t.tech}>
             {project.tags.map((tag) => (
@@ -57,19 +74,30 @@ function ProjectCard({ project }) {
               </li>
             ))}
           </ul>
-          <span className="project-card__open">
+          {project.homepage && (
+            <a
+              className="project-card__web"
+              href={project.homepage}
+              target="_blank"
+              rel="noreferrer"
+              aria-label={`${project.title} – ${t.projects.web}`}
+            >
+              {t.projects.web} <IconArrowUpRight />
+            </a>
+          )}
+          <span className="project-card__open" aria-hidden="true">
             {t.projects.open} <IconArrowUpRight />
           </span>
         </div>
       </div>
-    </a>
+    </article>
   );
 }
 
 export default function Projects({ projects, githubUrl, fullFx }) {
   const t = useT();
-  // Projekt ze showcase nad sekcí se v mřížce neopakuje.
-  const gridProjects = projects.filter((project) => !project.showcase);
+  // Projekt ze showcase nad sekcí se v mřížce neopakuje. Dokud nedorazí GitHub (null), je mřížka prázdná.
+  const gridProjects = (projects ?? []).filter((project) => !project.showcase);
   const count = String(gridProjects.length).padStart(2, "0");
 
   return (
@@ -87,7 +115,7 @@ export default function Projects({ projects, githubUrl, fullFx }) {
           <p className="section__lead">{t.projects.lead}</p>
         </Reveal>
 
-        {projects.length === 0 ? (
+        {projects?.length === 0 ? (
           // GitHub neodpověděl a v prohlížeči není ani uložená verze.
           <div className="project-empty">
             <p>{t.projects.empty}</p>

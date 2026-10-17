@@ -1383,7 +1383,7 @@ section[id] {
 }
 
 .project-card:hover,
-.project-card:focus-visible {
+.project-card:has(:focus-visible) {
   transform: translateY(-4px);
   border-color: color-mix(in srgb, var(--accent-a) 38%, transparent);
   box-shadow: 0 24px 50px rgba(0, 0, 0, 0.35), 0 0 40px color-mix(in srgb, var(--accent-a) 12%, transparent);
@@ -1521,10 +1521,34 @@ section[id] {
   color: #ffffff;
 }
 
+/* Odkaz na GitHub je nadpis, ale klikací je celá karta. Fokus se kreslí kolem karty. */
+.project-card__link::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+}
+
+.project-card__link:focus-visible {
+  outline: none;
+}
+
+.project-card:has(.project-card__link:focus-visible) {
+  outline: 2px solid var(--cyan);
+  outline-offset: 3px;
+}
+
 .project-card__desc {
   color: var(--text-muted);
   font-size: 0.93rem;
   line-height: 1.6;
+}
+
+.project-card__updated {
+  color: var(--text-dim);
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.03em;
 }
 
 .project-card__foot {
@@ -1537,7 +1561,8 @@ section[id] {
   border-top: 1px solid var(--line);
 }
 
-.project-card__open {
+.project-card__open,
+.project-card__web {
   display: inline-flex;
   flex-shrink: 0;
   align-items: center;
@@ -1549,13 +1574,30 @@ section[id] {
   text-transform: uppercase;
 }
 
-.project-card__open svg {
+/* Samostatný odkaz na web projektu, nad odkazem přes celou kartu. */
+.project-card__web {
+  position: relative;
+  z-index: 2;
+  margin-left: auto;
+  padding: 0.3rem 0.7rem;
+  border: 1px solid color-mix(in srgb, var(--accent-a) 45%, transparent);
+  border-radius: 999px;
+  transition: background-color 250ms ease;
+}
+
+.project-card__web:hover {
+  background: color-mix(in srgb, var(--accent-a) 16%, transparent);
+}
+
+.project-card__open svg,
+.project-card__web svg {
   width: 14px;
   height: 14px;
   transition: transform 350ms var(--ease-out);
 }
 
-.project-card:hover .project-card__open svg {
+.project-card:hover .project-card__open svg,
+.project-card__web:hover svg {
   transform: translate(2px, -2px);
 }
 

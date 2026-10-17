@@ -3,6 +3,7 @@ import { createContext, useContext } from "react";
 // Všechny texty webu v obou jazycích. Popisy projektů jdou z GitHubu tak, jak jsou, nepřekládají se.
 export const texts = {
   cs: {
+    locale: "cs",
     title: "Afrox — projekty, hry a vývojové experimenty",
     skipLink: "Přeskočit na projekty",
     sections: { projects: "Projekty", about: "O mně", contact: "Kontakt" },
@@ -38,6 +39,8 @@ export const texts = {
       title: ["Na čem jsem", "makal."],
       lead: "Hry v Godotu, weby v JavaScriptu, scrapery a AI experimenty v Pythonu. Karta tě hodí rovnou na GitHub.",
       open: "Otevřít",
+      web: "Web",
+      updated: "aktualizováno",
       empty: "Projekty se teď nepodařilo načíst z GitHubu. Najdeš je přímo na mém profilu.",
     },
     about: {
@@ -70,6 +73,7 @@ export const texts = {
   },
 
   en: {
+    locale: "en",
     title: "Afrox — projects, games and dev experiments",
     skipLink: "Skip to projects",
     sections: { projects: "Projects", about: "About", contact: "Contact" },
@@ -104,6 +108,8 @@ export const texts = {
       title: ["What I've been", "building."],
       lead: "Games in Godot, websites in JavaScript, scrapers and AI experiments in Python. Each card takes you straight to GitHub.",
       open: "Open",
+      web: "Website",
+      updated: "updated",
       empty: "Couldn't load the projects from GitHub right now. You'll find them on my profile.",
     },
     about: {

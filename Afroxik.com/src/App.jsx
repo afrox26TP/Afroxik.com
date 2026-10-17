@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from "react";
-import { getPageData, navSections } from "./lib/content";
+import { getCachedProjects, getProjects, navSections, profile as profileData, socials, toolbox } from "./lib/content";
 import { LangContext, texts } from "./lib/i18n";
 import { IS_LOW_END, PREFERS_REDUCED_MOTION } from "./lib/device";
 import { useParticles } from "./hooks/useParticles";
@@ -23,8 +23,8 @@ import { WarpOverlayDemo } from "./components/molecule-ui/WarpOverlayDemo";
 const PERFORMANCE_STORAGE_KEY = "afrox-performance-mode";
 const CAT_STORAGE_KEY = "afrox-cat";
 const LANG_STORAGE_KEY = "afrox-lang";
-// Plasma + fonty + data – teprve pak zmizí preloader.
-const READY_SIGNALS = 3;
+// Plasma + fonty – teprve pak zmizí preloader. Na GitHub se nečeká, projekty se doplní, až dorazí.
+const READY_SIGNALS = 2;
 
 function readStoredPerformanceMode() {
   try {
@@ -60,7 +60,8 @@ export default function App() {
   const [performanceMode, setPerformanceMode] = useState(readStoredPerformanceMode);
   const [catEnabled, setCatEnabled] = useState(readStoredCatEnabled);
   const [lang, setLang] = useState(readInitialLang);
-  const [data, setData] = useState(null);
+  // Hned projekty z minulé návštěvy, čerstvé z GitHubu je pak nahradí.
+  const [projects, setProjects] = useState(getCachedProjects);
   const [readyCount, setReadyCount] = useState(0);
   const [isPreloading, setIsPreloading] = useState(true);
   const [contactOpen, setContactOpen] = useState(false);
@@ -79,7 +80,7 @@ export default function App() {
 
   const [copiedKey, copy] = useCopy();
   const heroInView = useInView(heroElement);
-  const activeSection = useActiveSection(navSections, Boolean(data));
+  const activeSection = useActiveSection(navSections);
 
   useEffect(() => {
     const updateViewport = () => setIsCompactViewport(window.innerWidth < 900);
@@ -155,15 +156,13 @@ export default function App() {
 
   useEffect(() => {
     let isMounted = true;
-    getPageData().then((nextData) => {
-      if (!isMounted) return;
-      setData(nextData);
-      markReady("data");
+    getProjects().then((nextProjects) => {
+      if (isMounted) setProjects(nextProjects);
     });
     return () => {
       isMounted = false;
     };
-  }, [markReady]);
+  }, []);
 
   useEffect(() => {
     const fontsReady = document.fonts?.ready;
@@ -187,11 +186,11 @@ export default function App() {
 
   useParticles(canvasRef, useLowPerformanceMode);
 
-  const isContentReady = !isPreloading && Boolean(data);
+  const isContentReady = !isPreloading;
   const t = texts[lang];
-  const profile = data && { ...data.profile, ...t.profile };
+  const profile = { ...profileData, ...t.profile };
   const sections = navSections.map((id) => ({ id, label: t.sections[id] }));
-  const featured = data?.projects.find((project) => project.showcase);
+  const featured = projects?.find((project) => project.showcase);
 
   const pageClassName = [
     "fx-page",
@@ -226,7 +225,7 @@ export default function App() {
         <ScrollProgress />
 
         <SiteNav
-          name={profile?.name ?? "Afrox"}
+          name={profile.name}
           sections={sections}
           active={activeSection}
           performanceMode={performanceMode}
@@ -237,49 +236,45 @@ export default function App() {
           onContact={openContact}
         />
 
-        {data && (
-          <>
-            <main className="site-main" id="main">
-              <Hero ref={setHeroElement} profile={profile} onContact={openContact} />
-              {featured && <Showcase project={featured} lowMotion={lowMotion} />}
-              <Projects
-                projects={data.projects}
-                githubUrl={data.socials.find((social) => social.id === "github")?.href}
-                fullFx={shouldUseFullFx}
-              />
-              <About
-                profile={profile}
-                socials={data.socials}
-                toolbox={data.toolbox}
-                projects={data.projects}
-                copiedKey={copiedKey}
-                onCopy={copy}
-                onContact={openContact}
-                lowMotion={lowMotion}
-              />
-              <Contact socials={data.socials} copiedKey={copiedKey} onCopy={copy} onContact={openContact} />
-            </main>
+        <main className="site-main" id="main">
+          <Hero ref={setHeroElement} profile={profile} onContact={openContact} />
+          {featured && <Showcase project={featured} lowMotion={lowMotion} />}
+          <Projects
+            projects={projects}
+            githubUrl={socials.find((social) => social.id === "github")?.href}
+            fullFx={shouldUseFullFx}
+          />
+          <About
+            profile={profile}
+            socials={socials}
+            toolbox={toolbox}
+            projects={projects ?? []}
+            copiedKey={copiedKey}
+            onCopy={copy}
+            onContact={openContact}
+            lowMotion={lowMotion}
+          />
+          <Contact socials={socials} copiedKey={copiedKey} onCopy={copy} onContact={openContact} />
+        </main>
 
-            <SiteFooter
-              profile={profile}
-              sections={sections}
-              projects={data.projects}
-              socials={data.socials}
-              copiedKey={copiedKey}
-              onCopy={copy}
-              onContact={openContact}
-            />
+        <SiteFooter
+          profile={profile}
+          sections={sections}
+          projects={projects ?? []}
+          socials={socials}
+          copiedKey={copiedKey}
+          onCopy={copy}
+          onContact={openContact}
+        />
 
-            {/* Schovaná kočka nezmizí – odletí do loga v navigaci a tancuje tam. */}
-            <CatBuddy mode={catMode} animate={!lowMotion} home={!catEnabled} />
+        {/* Schovaná kočka nezmizí – odletí do loga v navigaci a tancuje tam. */}
+        <CatBuddy mode={catMode} animate={!lowMotion} home={!catEnabled} />
 
-            <WarpDialog open={contactOpen} onOpenChange={setContactOpen}>
-              <WarpDialogContent title={t.contactMe} description={t.dialog.description}>
-                <WarpOverlayDemo socials={data.socials} copiedKey={copiedKey} onCopy={copy} />
-              </WarpDialogContent>
-            </WarpDialog>
-          </>
-        )}
+        <WarpDialog open={contactOpen} onOpenChange={setContactOpen}>
+          <WarpDialogContent title={t.contactMe} description={t.dialog.description}>
+            <WarpOverlayDemo socials={socials} copiedKey={copiedKey} onCopy={copy} />
+          </WarpDialogContent>
+        </WarpDialog>
       </div>
     </LangContext.Provider>
   );

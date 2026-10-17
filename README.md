@@ -27,9 +27,12 @@ Produkční výstup vznikne v `dist/`.
   přepínač CZ/EN je v navigaci a volba se pamatuje. Anglická verze má adresu `/en`.
 - Kontakty a toolbox: `Afroxik.com/src/lib/content.js`
 - Projekty: veřejná repa z GitHubu, prohlížeč je načítá přes GitHub API (bez tokenu, s 10min cache v localStorage).
-  Název, popis, jazyk a topics se berou z GitHubu. V `content.js` jde repo skrýt (`hiddenRepos`),
+  Název, popis, jazyk, topics, web (pole Website) a čas posledního pushe se berou z GitHubu. Stránka na GitHub
+  nečeká: hned ukáže projekty z minulé návštěvy a čerstvé doplní, až dorazí. V `content.js` jde repo skrýt (`hiddenRepos`),
   přidat repo z cizího účtu (`extraRepos`) a vybrat to, které se ukáže jako velký 3D screenshot
   pod úvodem (`featured`).
+- Meta tagy a náhled pro sdílení odkazu: `index.html` a `Afroxik.com/public/og-image.jpg` (1200×630).
+  Anglickou kopii pro `/en` (`en.html`) vyrobí build podle `englishMeta` ve `vite.config.js`.
 - Vstup aplikace: `src/main.jsx`
 - Kompozice stránky: `Afroxik.com/src/App.jsx`
 - Sekce: `Afroxik.com/src/components/sections/` (Hero, Showcase, Projects, About, Contact)
@@ -62,6 +65,7 @@ Zvuk `Afroxik.com/public/media/damdam.m4a` je původní stopa (`videoplayback.m4
 ## Výkon
 
 - React, efekty a ostatní knihovny jsou rozdělené do cacheovatelných vendor chunků.
+- Soubory z buildu (`/assets/*`, s hashem v názvu) si prohlížeč drží rok, nastavuje to `Afroxik.com/public/_headers`.
 - Hlavní varianta automaticky omezuje náročné efekty na kompaktních displejích, coarse-pointer zařízeních a slabším hardwaru.
 - Uživatel může ručně zvolit režim `Auto`, `High` nebo `Low` (přepínač je v navigaci).
 - WebGL plasma se vykresluje jen v úvodní sekci; po odscrollování se pozastaví.
