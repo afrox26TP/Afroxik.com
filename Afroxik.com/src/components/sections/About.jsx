@@ -2,25 +2,26 @@ import Reveal from "../ui/Reveal";
 import { IconArrowRight, IconCheck, IconGamepad, IconGithub, socialIcons } from "../ui/icons";
 import { useT } from "../../lib/i18n";
 
-function HudStage({ tag, glyph }) {
+// V rámečku je buď znak (glyph), nebo obsah předaný jako children (avatar).
+function HudStage({ tag, glyph, children }) {
   return (
     <div className="hud-card__stage" aria-hidden="true">
       <div className="hud-card__glow" />
       <div className="hud-card__scan" />
       <span className="hud-card__tag">{tag}</span>
       <div className="hud-card__frame">
+        {children ?? <span className="hud-card__mono">{glyph}</span>}
         <i className="hud-card__corner hud-card__corner--tl" />
         <i className="hud-card__corner hud-card__corner--tr" />
         <i className="hud-card__corner hud-card__corner--bl" />
         <i className="hud-card__corner hud-card__corner--br" />
-        <span className="hud-card__mono">{glyph}</span>
       </div>
     </div>
   );
 }
 
 // Sekce „O mně“ – herní HUD karty (inspirace karty zakladatelů na Streamally) a toolbox (inspirace Komunita).
-export default function About({ profile, socials, toolbox, projects, copiedKey, onCopy, onContact }) {
+export default function About({ profile, socials, toolbox, projects, copiedKey, onCopy, onContact, lowMotion }) {
   const t = useT();
   const stats = [
     { value: String(projects.length).padStart(2, "0"), label: t.about.stats[0] },
@@ -41,7 +42,17 @@ export default function About({ profile, socials, toolbox, projects, copiedKey, 
         <div className="about-grid">
           <Reveal mode="self">
             <article className="hud-card">
-              <HudStage tag="player_01" glyph={profile.name.charAt(0)} />
+              <HudStage tag="player_01">
+                <img
+                  className="hud-card__avatar"
+                  src={lowMotion ? profile.avatar.still : profile.avatar.src}
+                  alt=""
+                  width="280"
+                  height="280"
+                  loading="lazy"
+                  decoding="async"
+                />
+              </HudStage>
               <div className="hud-card__body">
                 <span className="hud-card__role">{profile.role}</span>
                 <h3 className="hud-card__name">{profile.name}</h3>

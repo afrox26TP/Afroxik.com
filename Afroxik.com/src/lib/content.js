@@ -5,6 +5,8 @@ const profile = {
   handle: "afrox26TP",
   githubSince: 2022,
   heroTags: ["Godot", "Python", "React", "WebGL"],
+  // Avatar v kartě player_01 (skákající kočka z Tenoru); statický snímek je pro omezené animace.
+  avatar: { src: "/media/cat-jump.webp", still: "/media/cat-jump-still.webp" },
 };
 
 // Discord nemá veřejnou URL podle jména, proto se handle kopíruje do schránky.

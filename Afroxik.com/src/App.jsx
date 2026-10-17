@@ -255,6 +255,7 @@ export default function App() {
                 copiedKey={copiedKey}
                 onCopy={copy}
                 onContact={openContact}
+                lowMotion={lowMotion}
               />
               <Contact socials={data.socials} copiedKey={copiedKey} onCopy={copy} onContact={openContact} />
             </main>
