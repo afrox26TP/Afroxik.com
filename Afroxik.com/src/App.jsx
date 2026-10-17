@@ -203,7 +203,11 @@ export default function App() {
           <main className="site-main" id="main">
             <Hero ref={setHeroElement} profile={profile} onContact={openContact} />
             {featured && <Showcase project={featured} lowMotion={lowMotion} />}
-            <Projects projects={data.projects} fullFx={shouldUseFullFx} />
+            <Projects
+              projects={data.projects}
+              githubUrl={data.socials.find((social) => social.id === "github")?.href}
+              fullFx={shouldUseFullFx}
+            />
             <About
               profile={profile}
               socials={data.socials}

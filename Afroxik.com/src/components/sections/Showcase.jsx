@@ -87,7 +87,7 @@ export default function Showcase({ project, lowMotion }) {
             <h2 id="showcase-title" className="showcase__title">
               {project.title}
             </h2>
-            <p className="showcase__desc">{project.description}</p>
+            {project.description && <p className="showcase__desc">{project.description}</p>}
           </div>
           <ul className="tag-list" aria-label="Technologie" style={{ "--accent-a": project.accent[0] }}>
             {project.tags.map((tag) => (

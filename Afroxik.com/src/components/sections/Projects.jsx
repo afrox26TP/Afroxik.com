@@ -27,23 +27,25 @@ function ProjectCard({ project }) {
       style={{ "--accent-a": project.accent[0], "--accent-b": project.accent[1] }}
     >
       <span className="project-card__glow" aria-hidden="true" />
-      <div className="project-card__media">
-        <img
-          src={project.image}
-          alt=""
-          loading="lazy"
-          decoding="async"
-          style={project.imagePosition ? { objectPosition: project.imagePosition } : undefined}
-        />
-        <span className="project-card__year">{project.year}</span>
-      </div>
+      {project.image && (
+        <div className="project-card__media">
+          <img
+            src={project.image}
+            alt=""
+            loading="lazy"
+            decoding="async"
+            style={project.imagePosition ? { objectPosition: project.imagePosition } : undefined}
+          />
+        </div>
+      )}
       <div className="project-card__body">
         <span className="project-card__repo">
           <IconGithub />
-          {project.repo}
+          <span className="project-card__repo-name">{project.repo}</span>
+          <span className="project-card__year">{project.year}</span>
         </span>
         <h3 className="project-card__title">{breakable(project.title)}</h3>
-        <p className="project-card__desc">{project.description}</p>
+        {project.description && <p className="project-card__desc">{project.description}</p>}
         <div className="project-card__foot">
           <ul className="tag-list" aria-label="Technologie">
             {project.tags.map((tag) => (
@@ -61,7 +63,7 @@ function ProjectCard({ project }) {
   );
 }
 
-export default function Projects({ projects, fullFx }) {
+export default function Projects({ projects, githubUrl, fullFx }) {
   // Projekt ze showcase nad sekcí se v mřížce neopakuje.
   const gridProjects = projects.filter((project) => !project.showcase);
   const count = String(gridProjects.length).padStart(2, "0");
@@ -81,24 +83,34 @@ export default function Projects({ projects, fullFx }) {
           </p>
         </Reveal>
 
-        <div className="project-grid" onPointerMove={fullFx ? trackSpotlight : undefined}>
-          {gridProjects.map((project, index) => (
-            <Reveal key={project.id} mode="self" className="project-cell" style={{ "--delay": `${(index % 3) * 90}ms` }}>
-              <BorderGlow
-                disabled={!fullFx}
-                borderRadius={20}
-                colors={project.accent}
-                glowColor="212 100 72"
-                glowRadius={36}
-                glowIntensity={0.85}
-                coneSpread={25}
-                className="project-glow"
-              >
-                <ProjectCard project={project} />
-              </BorderGlow>
-            </Reveal>
-          ))}
-        </div>
+        {projects.length === 0 ? (
+          // GitHub neodpověděl a v prohlížeči není ani uložená verze.
+          <div className="project-empty">
+            <p>Projekty se teď nepodařilo načíst z GitHubu. Najdeš je přímo na mém profilu.</p>
+            <a className="btn-ghost" href={githubUrl} target="_blank" rel="noreferrer">
+              <IconGithub /> GitHub <IconArrowUpRight />
+            </a>
+          </div>
+        ) : (
+          <div className="project-grid" onPointerMove={fullFx ? trackSpotlight : undefined}>
+            {gridProjects.map((project, index) => (
+              <Reveal key={project.id} mode="self" className="project-cell" style={{ "--delay": `${(index % 3) * 90}ms` }}>
+                <BorderGlow
+                  disabled={!fullFx}
+                  borderRadius={20}
+                  colors={project.accent}
+                  glowColor="212 100 72"
+                  glowRadius={36}
+                  glowIntensity={0.85}
+                  coneSpread={25}
+                  className="project-glow"
+                >
+                  <ProjectCard project={project} />
+                </BorderGlow>
+              </Reveal>
+            ))}
+          </div>
+        )}
       </div>
     </section>
   );

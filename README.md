@@ -23,8 +23,11 @@ Produkční výstup vznikne v `dist/`.
 
 ## Obsah a struktura
 
-- Texty, projekty, kontakty a toolbox: `Afroxik.com/src/lib/content.js` – nový projekt stačí přidat sem
-  (projekt s polem `showcase` se zobrazí jako velký 3D screenshot pod úvodem).
+- Texty, kontakty a toolbox: `Afroxik.com/src/lib/content.js`
+- Projekty: veřejná repa z GitHubu, prohlížeč je načítá přes GitHub API (bez tokenu, s 10min cache v localStorage).
+  Název, popis, jazyk a topics se berou z GitHubu. V `content.js` jde repo skrýt (`hiddenRepos`),
+  přidat repo z cizího účtu (`extraRepos`) a vybrat to, které se ukáže jako velký 3D screenshot
+  pod úvodem (`featured`).
 - Vstup aplikace: `src/main.jsx`
 - Kompozice stránky: `Afroxik.com/src/App.jsx`
 - Sekce: `Afroxik.com/src/components/sections/` (Hero, Showcase, Projects, About, Contact)
