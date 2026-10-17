@@ -36,6 +36,12 @@ const sources = [
     width: 1800,
     quality: 84,
   },
+  {
+    input: path.join(outputDir, "rp-2025-26.png"),
+    output: path.join(outputDir, "rp-2025-26-720.webp"),
+    width: 720,
+    quality: 80,
+  },
 ];
 
 await fs.mkdir(outputDir, { recursive: true });

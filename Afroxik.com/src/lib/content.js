@@ -30,7 +30,7 @@ const extraRepos = ["BugHunter34/Muzeer", "BugHunter34/OpusCode"];
 const featured = {
   repo: "RP-2025-26",
   src: "/images/rp-2025-26.webp",
-  srcSet: "/images/project-screenshot.webp 1200w, /images/rp-2025-26.webp 1800w",
+  srcSet: "/images/rp-2025-26-720.webp 720w, /images/project-screenshot.webp 1200w, /images/rp-2025-26.webp 1800w",
   width: 1800,
   height: 970,
 };
@@ -124,6 +124,18 @@ function decorate(projects) {
       showcase: project.id === featured.repo ? featured : undefined,
     }));
 }
+
+// Showcase je vidět hned z lokálních dat (screenshot je největší prvek stránky). Popis a tagy doplní GitHub.
+export const featuredFallback = {
+  id: featured.repo,
+  title: featured.repo,
+  repo: `${profile.handle}/${featured.repo}`,
+  url: `https://github.com/${profile.handle}/${featured.repo}`,
+  description: null,
+  tags: [],
+  accent: accents[0],
+  showcase: featured,
+};
 
 // Projekty z minulé návštěvy (klidně starší než 10 minut), aby stránka nemusela čekat na GitHub. Null = žádné.
 export function getCachedProjects() {

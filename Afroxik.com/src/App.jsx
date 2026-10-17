@@ -1,5 +1,13 @@
 import { useCallback, useEffect, useRef, useState } from "react";
-import { getCachedProjects, getProjects, navSections, profile as profileData, socials, toolbox } from "./lib/content";
+import {
+  featuredFallback,
+  getCachedProjects,
+  getProjects,
+  navSections,
+  profile as profileData,
+  socials,
+  toolbox,
+} from "./lib/content";
 import { LangContext, texts } from "./lib/i18n";
 import { IS_LOW_END, PREFERS_REDUCED_MOTION } from "./lib/device";
 import { useParticles } from "./hooks/useParticles";
@@ -23,6 +31,7 @@ import { WarpOverlayDemo } from "./components/molecule-ui/WarpOverlayDemo";
 const PERFORMANCE_STORAGE_KEY = "afrox-performance-mode";
 const CAT_STORAGE_KEY = "afrox-cat";
 const LANG_STORAGE_KEY = "afrox-lang";
+const PRELOADER_SEEN_KEY = "afrox-preloader-seen";
 // Plasma + fonty – teprve pak zmizí preloader. Na GitHub se nečeká, projekty se doplní, až dorazí.
 const READY_SIGNALS = 2;
 
@@ -32,6 +41,15 @@ function readStoredPerformanceMode() {
     return storedMode === "auto" || storedMode === "high" || storedMode === "low" ? storedMode : "auto";
   } catch {
     return "auto";
+  }
+}
+
+// Preloader jen při první návštěvě v relaci (záložce), při dalším načtení se jde rovnou na web.
+function readPreloaderSeen() {
+  try {
+    return window.sessionStorage.getItem(PRELOADER_SEEN_KEY) === "1";
+  } catch {
+    return false;
   }
 }
 
@@ -63,7 +81,8 @@ export default function App() {
   // Hned projekty z minulé návštěvy, čerstvé z GitHubu je pak nahradí.
   const [projects, setProjects] = useState(getCachedProjects);
   const [readyCount, setReadyCount] = useState(0);
-  const [isPreloading, setIsPreloading] = useState(true);
+  const [skipPreloader] = useState(readPreloaderSeen);
+  const [isPreloading, setIsPreloading] = useState(!skipPreloader);
   const [contactOpen, setContactOpen] = useState(false);
   const [heroElement, setHeroElement] = useState(null);
   const [isCompactViewport, setIsCompactViewport] = useState(() =>
@@ -181,6 +200,15 @@ export default function App() {
     };
   }, [markReady]);
 
+  useEffect(() => {
+    if (isPreloading) return;
+    try {
+      window.sessionStorage.setItem(PRELOADER_SEEN_KEY, "1");
+    } catch {
+      // Ignore storage issues in private browsing or blocked storage contexts.
+    }
+  }, [isPreloading]);
+
   const handlePlasmaReady = useCallback(() => markReady("plasma"), [markReady]);
   const openContact = useCallback(() => setContactOpen(true), []);
 
@@ -190,7 +218,7 @@ export default function App() {
   const t = texts[lang];
   const profile = { ...profileData, ...t.profile };
   const sections = navSections.map((id) => ({ id, label: t.sections[id] }));
-  const featured = projects?.find((project) => project.showcase);
+  const featured = projects?.find((project) => project.showcase) ?? featuredFallback;
 
   const pageClassName = [
     "fx-page",
@@ -204,7 +232,9 @@ export default function App() {
   return (
     <LangContext.Provider value={t}>
       <div className={pageClassName}>
-        <Preloader progress={0.12 + (readyCount / READY_SIGNALS) * 0.72} done={isContentReady} name="Afrox" />
+        {!skipPreloader && (
+          <Preloader progress={0.12 + (readyCount / READY_SIGNALS) * 0.72} done={isContentReady} name="Afrox" />
+        )}
         <a className="skip-link" href="#projects">
           {t.skipLink}
         </a>
@@ -238,7 +268,7 @@ export default function App() {
 
         <main className="site-main" id="main">
           <Hero ref={setHeroElement} profile={profile} onContact={openContact} />
-          {featured && <Showcase project={featured} lowMotion={lowMotion} />}
+          <Showcase project={featured} lowMotion={lowMotion} />
           <Projects
             projects={projects}
             githubUrl={socials.find((social) => social.id === "github")?.href}

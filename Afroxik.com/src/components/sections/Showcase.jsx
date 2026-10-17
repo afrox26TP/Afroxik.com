@@ -78,6 +78,7 @@ export default function Showcase({ project, lowMotion }) {
               width={showcase.width}
               height={showcase.height}
               alt={`${project.title} – ${t.showcase.screenshot}`}
+              fetchPriority="high"
               decoding="async"
             />
           </div>

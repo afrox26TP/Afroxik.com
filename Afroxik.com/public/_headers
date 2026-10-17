@@ -1,3 +1,11 @@
 # Soubory z buildu mají v názvu hash, takže se nikdy nemění a prohlížeč si je může nechat rok.
 /assets/*
   Cache-Control: public, max-age=31536000, immutable
+
+# Fonty, obrázky a média se mění jen výjimečně: měsíc v cache. Při výměně dej souboru nový název.
+/fonts/*
+  Cache-Control: public, max-age=2592000
+/images/*
+  Cache-Control: public, max-age=2592000
+/media/*
+  Cache-Control: public, max-age=2592000

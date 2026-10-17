@@ -65,7 +65,10 @@ Zvuk `Afroxik.com/public/media/damdam.m4a` je původní stopa (`videoplayback.m4
 ## Výkon
 
 - React, efekty a ostatní knihovny jsou rozdělené do cacheovatelných vendor chunků.
-- Soubory z buildu (`/assets/*`, s hashem v názvu) si prohlížeč drží rok, nastavuje to `Afroxik.com/public/_headers`.
+- Cache nastavuje `Afroxik.com/public/_headers`: soubory z buildu (`/assets/*`, s hashem v názvu) rok,
+  fonty, obrázky a média měsíc. Když takový soubor vyměníš, dej mu nový název, jinak ho návštěvníci uvidí až za měsíc.
+- Preloader se ukáže jen při první návštěvě v záložce, při dalším načtení se jde rovnou na web.
+- Showcase je vidět hned (screenshot je lokální, v mobilní velikosti od 720 px), popis a tagy doplní GitHub.
 - Hlavní varianta automaticky omezuje náročné efekty na kompaktních displejích, coarse-pointer zařízeních a slabším hardwaru.
 - Uživatel může ručně zvolit režim `Auto`, `High` nebo `Low` (přepínač je v navigaci).
 - WebGL plasma se vykresluje jen v úvodní sekci; po odscrollování se pozastaví.
