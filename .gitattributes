@@ -1,0 +1,4 @@
+# Zabalené soubory hry a Godot binárky nesmí projít převodem konců řádků.
+*.gz binary
+*.wasm binary
+*.pck binary

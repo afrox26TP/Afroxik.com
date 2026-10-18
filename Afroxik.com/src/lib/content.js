@@ -34,9 +34,10 @@ const homepages = {
 };
 
 // Repo, které se ukáže jako velký 3D screenshot pod úvodem. Texty bere z GitHubu, screenshot je lokální,
-// nadpis nad ním je v i18n.js (showcase.kicker).
+// nadpis nad ním je v i18n.js (showcase.kicker). Hra běží na /play/ (viz scripts/import-game.mjs).
 const featured = {
   repo: "RP-2025-26",
+  play: "/play/",
   src: "/images/rp-2025-26.webp",
   srcSet: "/images/rp-2025-26-720.webp 720w, /images/project-screenshot.webp 1200w, /images/rp-2025-26.webp 1800w",
   width: 1800,

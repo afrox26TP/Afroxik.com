@@ -33,7 +33,12 @@ export const texts = {
       langSwitch: { lang: "en", short: "EN", name: "English", label: "Switch to English" },
     },
     hero: { projects: "mrkni, co stavím", contact: "napiš mi" },
-    showcase: { kicker: "Featured · Ročníková práce", screenshot: "screenshot ze hry" },
+    showcase: {
+      kicker: "Featured · Ročníková práce",
+      screenshot: "screenshot ze hry",
+      play: { chip: "Hrát", label: "v prohlížeči" },
+      playNote: "Běží přímo v prohlížeči, stáhne asi 21 MB. Nejlíp na počítači s myší.",
+    },
     projects: {
       kicker: "Další projekty",
       title: ["Na čem jsem", "makal."],
@@ -102,7 +107,12 @@ export const texts = {
       langSwitch: { lang: "cs", short: "CZ", name: "Čeština", label: "Přepnout do češtiny" },
     },
     hero: { projects: "see what I'm building", contact: "message me" },
-    showcase: { kicker: "Featured · School project", screenshot: "game screenshot" },
+    showcase: {
+      kicker: "Featured · School project",
+      screenshot: "game screenshot",
+      play: { chip: "Play", label: "in your browser" },
+      playNote: "Runs right in your browser, about a 21 MB download. Best on a desktop with a mouse.",
+    },
     projects: {
       kicker: "More projects",
       title: ["What I've been", "building."],

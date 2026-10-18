@@ -91,6 +91,16 @@ export default function Showcase({ project, lowMotion }) {
               {project.title}
             </h2>
             {project.description && <p className="showcase__desc">{project.description}</p>}
+            {showcase.play && (
+              <div className="showcase__actions">
+                <a className="pill-button pill-button--blue" href={showcase.play} target="_blank" rel="noreferrer">
+                  <span className="pill-button__chip">{t.showcase.play.chip}</span>
+                  <span className="pill-button__label">{t.showcase.play.label}</span>
+                  <IconArrowUpRight className="pill-button__arrow" />
+                </a>
+                <small className="showcase__note">{t.showcase.playNote}</small>
+              </div>
+            )}
           </div>
           <ul className="tag-list" aria-label={t.tech} style={{ "--accent-a": project.accent[0] }}>
             {project.tags.map((tag) => (

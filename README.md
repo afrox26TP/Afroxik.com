@@ -42,6 +42,22 @@ Produkční výstup vznikne v `dist/`.
 
 Projekt nepoužívá databázi ani serverový backend.
 
+## Hra v prohlížeči
+
+Ročníková práce (RP-2025-26) běží na `/play/` přímo z tohoto webu. Cloudflare bere soubory do 25 MiB a `index.wasm`
+z Godotu má přes 35 MB, proto jsou `index.wasm` a `index.pck` zabalené gzipem a `index.html` hry má navíc skript,
+který je v prohlížeči rozbalí dřív, než si je Godot načte (`DecompressionStream`, prohlížeče od roku 2023).
+
+Nová verze hry: v Godotu exportuj preset Web (Thread Support vypnuté, soubor pojmenuj `index.html`) a pak:
+
+```bash
+node Afroxik.com/scripts/import-game.mjs "C:/cesta/k/exportu" "European Sidequest"
+```
+
+Skript složku `Afroxik.com/public/play/` vyprázdní, zabalí oba velké soubory, zkopíruje zbytek, vloží rozbalovací skript
+a nastaví titulek. Zabalené soubory mají v adrese verzi (`?v=`), takže se nikdy nesejdou se starou verzí z cache.
+Tlačítko „Hrát v prohlížeči“ v showcase bere adresu z `featured.play` v `content.js`.
+
 ## Kočka „Dam dam didi didi“
 
 Létající kamarád: `Afroxik.com/src/components/site/CatBuddy.jsx`, média v `Afroxik.com/public/media/`.
