@@ -107,7 +107,7 @@ export default function SiteNav({
             >
               {langSwitch.short}
             </button>
-            <button type="button" className="nav-cta" onClick={handleContact}>
+            <button type="button" className="nav-cta liquid liquid--metal" onClick={handleContact}>
               <LetterSwap text={t.contactMe} />
             </button>
             <button
@@ -152,7 +152,7 @@ export default function SiteNav({
           >
             <IconGlobe /> {langSwitch.name}
           </button>
-          <button type="button" className="nav-cta nav-cta--lg" onClick={handleContact}>
+          <button type="button" className="nav-cta nav-cta--lg liquid liquid--metal" onClick={handleContact}>
             {t.contactMe}
           </button>
         </div>

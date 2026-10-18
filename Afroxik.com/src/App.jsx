@@ -213,6 +213,19 @@ export default function App() {
     }
   }, [isPreloading]);
 
+  // Odlesk na tekutých tlačítkách (.liquid v index.css) sleduje kurzor.
+  useEffect(() => {
+    const onMove = (event) => {
+      for (let el = event.target.closest?.(".liquid"); el; el = el.parentElement?.closest(".liquid")) {
+        const rect = el.getBoundingClientRect();
+        el.style.setProperty("--lx", `${((event.clientX - rect.left) / rect.width) * 100}%`);
+        el.style.setProperty("--ly", `${((event.clientY - rect.top) / rect.height) * 100}%`);
+      }
+    };
+    window.addEventListener("pointermove", onMove, { passive: true });
+    return () => window.removeEventListener("pointermove", onMove);
+  }, []);
+
   const handlePlasmaReady = useCallback(() => markReady("plasma"), [markReady]);
   const openContact = useCallback(() => setContactOpen(true), []);
 

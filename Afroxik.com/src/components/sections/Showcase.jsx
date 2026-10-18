@@ -121,8 +121,11 @@ export default function Showcase({ project, lowMotion, embed = false, playing = 
                 />
                 {canEmbed && (
                   <button type="button" className="showcase__start" onClick={startGame} aria-label={t.showcase.start}>
-                    <span className="showcase__start-pill">
-                      <IconPlay /> {t.showcase.start}
+                    <span className="showcase__start-pill liquid liquid--glass">
+                      <span className="showcase__start-icon liquid liquid--metal">
+                        <IconPlay />
+                      </span>
+                      {t.showcase.start}
                     </span>
                   </button>
                 )}
@@ -141,14 +144,20 @@ export default function Showcase({ project, lowMotion, embed = false, playing = 
             {showcase.play && (
               <div className="showcase__actions">
                 {canEmbed ? (
-                  <button type="button" className="pill-button pill-button--blue" onClick={playing ? stopGame : startGame}>
-                    <span className="pill-button__chip">{playing ? t.showcase.close : t.showcase.play.chip}</span>
+                  <button
+                    type="button"
+                    className="pill-button pill-button--blue liquid liquid--glass"
+                    onClick={playing ? stopGame : startGame}
+                  >
+                    <span className="pill-button__chip liquid liquid--metal">
+                      {playing ? t.showcase.close : t.showcase.play.chip}
+                    </span>
                     <span className="pill-button__label">{playing ? t.showcase.closeLabel : t.showcase.play.label}</span>
                     {playing ? <IconClose className="pill-button__arrow" /> : <IconPlay className="pill-button__arrow" />}
                   </button>
                 ) : (
-                  <a className="pill-button pill-button--blue" href={showcase.play} target="_blank" rel="noreferrer">
-                    <span className="pill-button__chip">{t.showcase.play.chip}</span>
+                  <a className="pill-button pill-button--blue liquid liquid--glass" href={showcase.play} target="_blank" rel="noreferrer">
+                    <span className="pill-button__chip liquid liquid--metal">{t.showcase.play.chip}</span>
                     <span className="pill-button__label">{t.showcase.play.label}</span>
                     <IconArrowUpRight className="pill-button__arrow" />
                   </a>

@@ -1226,26 +1226,28 @@ section[id] {
 .showcase__start-pill {
   display: inline-flex;
   align-items: center;
-  gap: 0.6rem;
-  padding: 0.9rem 1.7rem 0.9rem 1.3rem;
+  gap: 0.8rem;
+  padding: 0.5rem 1.7rem 0.5rem 0.5rem;
   border-radius: 999px;
   color: #ffffff;
   font-size: 1.05rem;
   font-weight: 800;
   letter-spacing: 0.04em;
-  background: linear-gradient(135deg, #3d6dff, #59a8ff);
-  box-shadow: 0 0 0 1px rgba(124, 236, 255, 0.5), 0 18px 40px rgba(0, 0, 0, 0.45), 0 0 40px rgba(89, 168, 255, 0.45);
-  transition: transform 300ms var(--ease-spring);
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.55);
 }
 
-.showcase__start-pill svg {
-  width: 22px;
-  height: 22px;
+.showcase__start-icon {
+  display: grid;
+  place-items: center;
+  width: 2.7rem;
+  height: 2.7rem;
+  border-radius: 50%;
 }
 
-.showcase__start:hover .showcase__start-pill,
-.showcase__start:focus-visible .showcase__start-pill {
-  transform: scale(1.06);
+.showcase__start-icon svg {
+  width: 18px;
+  height: 18px;
+  margin-left: 2px;
 }
 
 .showcase__screen.is-playing {
@@ -1284,6 +1286,154 @@ section[id] {
 .showcase__newtab svg {
   width: 12px;
   height: 12px;
+}
+
+/* ══ LIQUID GLASS / LIQUID METAL ════════ */
+/* Tekuté sklo a kov pro hlavní tlačítka. Odlesk sleduje kurzor (--lx/--ly nastavuje App), okraj chytá světlo
+   a při najetí se tlačítko pružně „přelije“. Bez JS i bez backdrop-filter vypadá pořád dobře. */
+@property --lx {
+  syntax: "<percentage>";
+  inherits: true;
+  initial-value: 28%;
+}
+
+@property --ly {
+  syntax: "<percentage>";
+  inherits: true;
+  initial-value: 0%;
+}
+
+.liquid {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.5),
+    inset 0 -1px 0 rgba(255, 255, 255, 0.12),
+    inset 0 -14px 22px -14px var(--lq-glow, rgba(124, 200, 255, 0.6)),
+    0 14px 34px -12px rgba(0, 0, 0, 0.6),
+    0 0 28px -8px var(--lq-halo, rgba(89, 168, 255, 0.5));
+  transition:
+    transform 550ms var(--ease-spring),
+    box-shadow 300ms ease,
+    background-color 300ms ease,
+    --lx 220ms ease-out,
+    --ly 220ms ease-out;
+}
+
+/* Odlesk: světlá „čočka“ nahoře, bod u kurzoru a pruh světla, který při najetí přejede přes tlačítko. */
+.liquid::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  border-radius: inherit;
+  pointer-events: none;
+  background:
+    linear-gradient(105deg, transparent 38%, rgba(255, 255, 255, 0.34) 50%, transparent 62%) 160% 0 / 260% 100% no-repeat,
+    radial-gradient(70% 120% at var(--lx) var(--ly), rgba(255, 255, 255, 0.36), transparent 55%),
+    linear-gradient(180deg, rgba(255, 255, 255, 0.3), rgba(255, 255, 255, 0.07) 45%, transparent 55%);
+  transition: background-position 900ms var(--ease-out);
+}
+
+/* Okraj: tenká linka, která chytá světlo vlevo nahoře a vpravo dole. */
+.liquid::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  padding: 1px;
+  pointer-events: none;
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.9), rgba(255, 255, 255, 0.14) 36%, rgba(255, 255, 255, 0.04) 64%, rgba(170, 220, 255, 0.6));
+  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+  mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  mask-composite: exclude;
+}
+
+.liquid:hover,
+.showcase__start:is(:hover, :focus-visible) .liquid--glass {
+  transform: scale(1.045);
+}
+
+.liquid:hover::before,
+.showcase__start:is(:hover, :focus-visible) .liquid--glass::before {
+  background-position: -60% 0, 0 0, 0 0;
+}
+
+.liquid:active {
+  transform: scale(0.97, 1.02);
+  transition-duration: 160ms;
+}
+
+/* Sklo: průhledné, rozmazává a sytí, co je za ním. */
+.liquid--glass {
+  background: var(--lq-tint, rgba(30, 60, 130, 0.22));
+  -webkit-backdrop-filter: blur(var(--lq-blur, 12px)) saturate(180%) brightness(1.08);
+  backdrop-filter: blur(var(--lq-blur, 12px)) saturate(180%) brightness(1.08);
+}
+
+/* Kov: modrý chrom s horizontem uprostřed; lesklý pruh přes něj občas přejede sám. */
+.liquid--metal {
+  --lq-glow: rgba(150, 215, 255, 0.85);
+  --lq-halo: rgba(61, 109, 255, 0.6);
+  color: #ffffff;
+  text-shadow: 0 1px 1px rgba(6, 20, 80, 0.55);
+  background: linear-gradient(180deg, #7ab4ff 0%, #4a84ff 40%, #2a58e8 49%, #1f45cf 51%, #2d62f2 74%, #62a6ff 100%);
+}
+
+.liquid--metal::before {
+  animation: liquidSheen 6.5s var(--ease-out) infinite;
+}
+
+.showcase__start-pill.liquid--glass {
+  --lq-tint: rgba(10, 22, 56, 0.34);
+  --lq-blur: 8px;
+}
+
+.pill-button.liquid--glass {
+  --lq-tint: rgba(77, 143, 255, 0.12);
+  --lq-blur: 14px;
+}
+
+.pill-button.liquid--glass:hover {
+  background-color: rgba(77, 143, 255, 0.2);
+}
+
+/* Kapka uvnitř tlačítka se při najetí natáhne k šipce, jako by tekla. */
+.pill-button.liquid:hover .pill-button__chip.liquid {
+  transform: scale(1.08, 0.94) translateX(2px);
+}
+
+.low-end .liquid--glass {
+  -webkit-backdrop-filter: none;
+  backdrop-filter: none;
+  background: rgba(22, 44, 100, 0.85);
+}
+
+.low-end .liquid--metal::before {
+  animation: none;
+}
+
+@keyframes liquidSheen {
+  0%,
+  72% {
+    background-position: 160% 0, 0 0, 0 0;
+  }
+  100% {
+    background-position: -60% 0, 0 0, 0 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .liquid {
+    transition: box-shadow 300ms ease, background-color 300ms ease;
+  }
+
+  .liquid::before {
+    animation: none;
+    transition: none;
+  }
 }
 
 .showcase__caption {
