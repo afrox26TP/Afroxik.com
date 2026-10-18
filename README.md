@@ -80,6 +80,14 @@ ffmpeg -ss 7.6 -i damdamdidi.mp4 -frames:v 1 \
 
 Zvuk `Afroxik.com/public/media/damdam.m4a` je původní stopa (`videoplayback.m4a`).
 
+## Tekutý kov a sklo
+
+- Tlačítka v úvodu, HRÁT a NAPIŠ MI mají rám z tekutého kovu: pod tlačítkem běží malé WebGL plátno
+  (`Afroxik.com/src/components/ui/MetalLayer.jsx`), tmavý panel ho zakryje všude kromě rámu a štítku.
+  Shader je převzatý z knihovny [Argent](https://github.com/seangeng/argent) (MIT, licence je v hlavičce
+  `Afroxik.com/src/lib/liquidMetal.js`). Kov teče jen když je vidět; na slabém zařízení je místo něj CSS gradient.
+- Spustit hru v showcase je čiré sklo; v Chromu se pozadí na okrajích láme (`Afroxik.com/src/lib/liquidRefraction.js`).
+
 ## Výkon
 
 - React, efekty a ostatní knihovny jsou rozdělené do cacheovatelných vendor chunků.

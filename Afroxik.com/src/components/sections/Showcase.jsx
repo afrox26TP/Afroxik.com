@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useRef } from "react";
 import { IconArrowUpRight, IconClose, IconExpand, IconPlay } from "../ui/icons";
+import MetalLayer from "../ui/MetalLayer";
 import { useT } from "../../lib/i18n";
 
 // Screenshot hlavního projektu, který se při scrollu „narovná“ ze 3D náklonu (inspirace Streamally).
@@ -144,22 +145,22 @@ export default function Showcase({ project, lowMotion, embed = false, playing = 
             {showcase.play && (
               <div className="showcase__actions">
                 {canEmbed ? (
-                  <button
-                    type="button"
-                    className="pill-button pill-button--blue liquid liquid--glass"
-                    onClick={playing ? stopGame : startGame}
-                  >
-                    <span className="pill-button__chip liquid liquid--metal">
-                      {playing ? t.showcase.close : t.showcase.play.chip}
+                  <button type="button" className="pill-button metal-pill" onClick={playing ? stopGame : startGame}>
+                    <MetalLayer still={lowMotion} />
+                    <span className="metal-pill__core">
+                      <span className="pill-button__chip">{playing ? t.showcase.close : t.showcase.play.chip}</span>
+                      <span className="pill-button__label">{playing ? t.showcase.closeLabel : t.showcase.play.label}</span>
+                      {playing ? <IconClose className="pill-button__arrow" /> : <IconPlay className="pill-button__arrow" />}
                     </span>
-                    <span className="pill-button__label">{playing ? t.showcase.closeLabel : t.showcase.play.label}</span>
-                    {playing ? <IconClose className="pill-button__arrow" /> : <IconPlay className="pill-button__arrow" />}
                   </button>
                 ) : (
-                  <a className="pill-button pill-button--blue liquid liquid--glass" href={showcase.play} target="_blank" rel="noreferrer">
-                    <span className="pill-button__chip liquid liquid--metal">{t.showcase.play.chip}</span>
-                    <span className="pill-button__label">{t.showcase.play.label}</span>
-                    <IconArrowUpRight className="pill-button__arrow" />
+                  <a className="pill-button metal-pill" href={showcase.play} target="_blank" rel="noreferrer">
+                    <MetalLayer still={lowMotion} />
+                    <span className="metal-pill__core">
+                      <span className="pill-button__chip">{t.showcase.play.chip}</span>
+                      <span className="pill-button__label">{t.showcase.play.label}</span>
+                      <IconArrowUpRight className="pill-button__arrow" />
+                    </span>
                   </a>
                 )}
                 <small className="showcase__note">

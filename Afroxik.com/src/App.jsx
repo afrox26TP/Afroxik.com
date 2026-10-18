@@ -284,10 +284,11 @@ export default function App() {
           onCatToggle={handleCatToggle}
           onLangToggle={handleLangToggle}
           onContact={openContact}
+          lowMotion={lowMotion}
         />
 
         <main className="site-main" id="main">
-          <Hero ref={setHeroElement} profile={profile} onContact={openContact} />
+          <Hero ref={setHeroElement} profile={profile} onContact={openContact} lowMotion={lowMotion} />
           <Showcase
             project={featured}
             lowMotion={lowMotion}

@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import LetterSwap from "../ui/LetterSwap";
+import MetalLayer from "../ui/MetalLayer";
 import PerformanceToggle from "../ui/PerformanceToggle";
 import { BrandMark, IconCat, IconClose, IconGlobe, IconMenu } from "../ui/icons";
 import { CAT_POSTER_SRC } from "../../lib/cat";
@@ -16,6 +17,7 @@ export default function SiteNav({
   onCatToggle,
   onLangToggle,
   onContact,
+  lowMotion,
 }) {
   const t = useT();
   const langSwitch = t.nav.langSwitch;
@@ -107,8 +109,11 @@ export default function SiteNav({
             >
               {langSwitch.short}
             </button>
-            <button type="button" className="nav-cta liquid liquid--metal" onClick={handleContact}>
-              <LetterSwap text={t.contactMe} />
+            <button type="button" className="nav-cta metal-btn" onClick={handleContact}>
+              <MetalLayer still={lowMotion} />
+              <span className="metal-btn__core">
+                <LetterSwap text={t.contactMe} />
+              </span>
             </button>
             <button
               type="button"
@@ -152,8 +157,9 @@ export default function SiteNav({
           >
             <IconGlobe /> {langSwitch.name}
           </button>
-          <button type="button" className="nav-cta nav-cta--lg liquid liquid--metal" onClick={handleContact}>
-            {t.contactMe}
+          <button type="button" className="nav-cta nav-cta--lg metal-btn" onClick={handleContact}>
+            <MetalLayer still={lowMotion} />
+            <span className="metal-btn__core">{t.contactMe}</span>
           </button>
         </div>
       )}

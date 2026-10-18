@@ -1,7 +1,8 @@
 import { IconArrowRight } from "../ui/icons";
+import MetalLayer from "../ui/MetalLayer";
 import { useT } from "../../lib/i18n";
 
-export default function Hero({ ref, profile, onContact }) {
+export default function Hero({ ref, profile, onContact, lowMotion }) {
   const t = useT();
 
   return (
@@ -37,15 +38,21 @@ export default function Hero({ ref, profile, onContact }) {
         </p>
 
         <div className="hero__actions">
-          <a className="pill-button pill-button--blue liquid liquid--glass" href="#projects">
-            <span className="pill-button__chip liquid liquid--metal">{t.sections.projects}</span>
-            <span className="pill-button__label">{t.hero.projects}</span>
-            <IconArrowRight className="pill-button__arrow" />
+          <a className="pill-button metal-pill" href="#projects">
+            <MetalLayer still={lowMotion} />
+            <span className="metal-pill__core">
+              <span className="pill-button__chip">{t.sections.projects}</span>
+              <span className="pill-button__label">{t.hero.projects}</span>
+              <IconArrowRight className="pill-button__arrow" />
+            </span>
           </a>
-          <button type="button" className="pill-button pill-button--violet liquid liquid--glass" onClick={onContact}>
-            <span className="pill-button__chip liquid liquid--metal">{t.sections.contact}</span>
-            <span className="pill-button__label">{t.hero.contact}</span>
-            <IconArrowRight className="pill-button__arrow" />
+          <button type="button" className="pill-button metal-pill metal-pill--violet" onClick={onContact}>
+            <MetalLayer tone="amethyst" still={lowMotion} />
+            <span className="metal-pill__core">
+              <span className="pill-button__chip">{t.sections.contact}</span>
+              <span className="pill-button__label">{t.hero.contact}</span>
+              <IconArrowRight className="pill-button__arrow" />
+            </span>
           </button>
         </div>
       </div>
