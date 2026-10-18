@@ -56,7 +56,9 @@ node Afroxik.com/scripts/import-game.mjs "C:/cesta/k/exportu" "European Sideques
 
 Skript složku `Afroxik.com/public/play/` vyprázdní, zabalí oba velké soubory, zkopíruje zbytek, vloží rozbalovací skript
 a nastaví titulek. Zabalené soubory mají v adrese verzi (`?v=`), takže se nikdy nesejdou se starou verzí z cache.
-Tlačítko „Hrát v prohlížeči“ v showcase bere adresu z `featured.play` v `content.js`.
+Showcase bere adresu z `featured.play` v `content.js`. Na počítači se hra po kliknutí na ▶ spustí přímo v „okně
+prohlížeče“ místo screenshotu (iframe, tlačítka Celá obrazovka a Zavřít v liště), po dobu hraní jsou vypnuté efekty
+pozadí. Na mobilu a dotykových zařízeních se otevře zvlášť v nové záložce.
 
 ## Kočka „Dam dam didi didi“
 

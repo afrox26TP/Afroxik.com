@@ -84,6 +84,8 @@ export default function App() {
   const [skipPreloader] = useState(readPreloaderSeen);
   const [isPreloading, setIsPreloading] = useState(!skipPreloader);
   const [contactOpen, setContactOpen] = useState(false);
+  // Hra v showcase běží v iframe jen na počítači; po dobu hraní se vypnou efekty pozadí, ať se nepřetahují o procesor.
+  const [gamePlaying, setGamePlaying] = useState(false);
   const [heroElement, setHeroElement] = useState(null);
   const [isCompactViewport, setIsCompactViewport] = useState(() =>
     typeof window !== "undefined" ? window.innerWidth < 900 : false,
@@ -118,6 +120,8 @@ export default function App() {
     performanceMode === "low" ? true : performanceMode === "high" ? false : IS_LOW_END;
   const shouldUseFullFx = !useLowPerformanceMode && !isCompactViewport && !isCoarsePointer;
   const lowMotion = PREFERS_REDUCED_MOTION || useLowPerformanceMode;
+  const embedGame = !isCompactViewport && !isCoarsePointer;
+  const gameActive = gamePlaying && embedGame;
 
   const handlePerformanceChange = useCallback((nextMode) => {
     setPerformanceMode(nextMode);
@@ -212,7 +216,7 @@ export default function App() {
   const handlePlasmaReady = useCallback(() => markReady("plasma"), [markReady]);
   const openContact = useCallback(() => setContactOpen(true), []);
 
-  useParticles(canvasRef, useLowPerformanceMode);
+  useParticles(canvasRef, useLowPerformanceMode || gameActive);
 
   const isContentReady = !isPreloading;
   const t = texts[lang];
@@ -247,11 +251,11 @@ export default function App() {
           opacity={1}
           mouseInteractive={shouldUseFullFx}
           lowEnd={useLowPerformanceMode}
-          paused={!heroInView}
+          paused={!heroInView || gameActive}
           onReady={handlePlasmaReady}
         />
         <div className="page-backdrop" aria-hidden="true" />
-        {!useLowPerformanceMode && <canvas ref={canvasRef} className="fx-canvas" aria-hidden="true" />}
+        {!useLowPerformanceMode && !gameActive && <canvas ref={canvasRef} className="fx-canvas" aria-hidden="true" />}
         <ScrollProgress />
 
         <SiteNav
@@ -268,7 +272,13 @@ export default function App() {
 
         <main className="site-main" id="main">
           <Hero ref={setHeroElement} profile={profile} onContact={openContact} />
-          <Showcase project={featured} lowMotion={lowMotion} />
+          <Showcase
+            project={featured}
+            lowMotion={lowMotion}
+            embed={embedGame}
+            playing={gameActive}
+            onPlayingChange={setGamePlaying}
+          />
           <Projects
             projects={projects}
             githubUrl={socials.find((social) => social.id === "github")?.href}
@@ -297,8 +307,8 @@ export default function App() {
           onContact={openContact}
         />
 
-        {/* Schovaná kočka nezmizí – odletí do loga v navigaci a tancuje tam. */}
-        <CatBuddy mode={catMode} animate={!lowMotion} home={!catEnabled} />
+        {/* Schovaná kočka nezmizí – odletí do loga v navigaci a tancuje tam. Při hraní hry tam jde taky, ať ji nezakrývá. */}
+        <CatBuddy mode={catMode} animate={!lowMotion} home={!catEnabled || gameActive} />
 
         <WarpDialog open={contactOpen} onOpenChange={setContactOpen}>
           <WarpDialogContent title={t.contactMe} description={t.dialog.description}>

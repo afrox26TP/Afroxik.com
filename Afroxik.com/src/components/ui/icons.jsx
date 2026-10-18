@@ -142,6 +142,22 @@ export function IconGlobe(props) {
   );
 }
 
+export function IconPlay(props) {
+  return (
+    <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" focusable="false" {...props}>
+      <path d="M8 5.5v13a1 1 0 0 0 1.53.85l10.2-6.5a1 1 0 0 0 0-1.7L9.53 4.65A1 1 0 0 0 8 5.5Z" />
+    </svg>
+  );
+}
+
+export function IconExpand(props) {
+  return (
+    <Stroke {...props}>
+      <path d="M9 4H4v5M15 4h5v5M9 20H4v-5M15 20h5v-5" />
+    </Stroke>
+  );
+}
+
 export function IconGamepad(props) {
   return (
     <Stroke {...props}>
