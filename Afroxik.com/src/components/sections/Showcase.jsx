@@ -122,7 +122,7 @@ export default function Showcase({ project, lowMotion, embed = false, playing = 
                 {canEmbed && (
                   <button type="button" className="showcase__start" onClick={startGame} aria-label={t.showcase.start}>
                     <span className="showcase__start-pill liquid liquid--glass">
-                      <span className="showcase__start-icon liquid liquid--metal">
+                      <span className="showcase__start-icon liquid liquid--drop">
                         <IconPlay />
                       </span>
                       {t.showcase.start}
@@ -149,7 +149,7 @@ export default function Showcase({ project, lowMotion, embed = false, playing = 
                     className="pill-button pill-button--blue liquid liquid--glass"
                     onClick={playing ? stopGame : startGame}
                   >
-                    <span className="pill-button__chip liquid liquid--metal">
+                    <span className="pill-button__chip liquid liquid--drop">
                       {playing ? t.showcase.close : t.showcase.play.chip}
                     </span>
                     <span className="pill-button__label">{playing ? t.showcase.closeLabel : t.showcase.play.label}</span>
@@ -157,7 +157,7 @@ export default function Showcase({ project, lowMotion, embed = false, playing = 
                   </button>
                 ) : (
                   <a className="pill-button pill-button--blue liquid liquid--glass" href={showcase.play} target="_blank" rel="noreferrer">
-                    <span className="pill-button__chip liquid liquid--metal">{t.showcase.play.chip}</span>
+                    <span className="pill-button__chip liquid liquid--drop">{t.showcase.play.chip}</span>
                     <span className="pill-button__label">{t.showcase.play.label}</span>
                     <IconArrowUpRight className="pill-button__arrow" />
                   </a>

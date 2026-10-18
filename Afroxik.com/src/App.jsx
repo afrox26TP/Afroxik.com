@@ -10,6 +10,7 @@ import {
 } from "./lib/content";
 import { LangContext, texts } from "./lib/i18n";
 import { IS_LOW_END, PREFERS_REDUCED_MOTION } from "./lib/device";
+import { initLiquidRefraction } from "./lib/liquidRefraction";
 import { useParticles } from "./hooks/useParticles";
 import { useCopy } from "./hooks/useCopy";
 import { useInView } from "./hooks/useInView";
@@ -225,6 +226,8 @@ export default function App() {
     window.addEventListener("pointermove", onMove, { passive: true });
     return () => window.removeEventListener("pointermove", onMove);
   }, []);
+
+  useEffect(() => initLiquidRefraction(), []);
 
   const handlePlasmaReady = useCallback(() => markReady("plasma"), [markReady]);
   const openContact = useCallback(() => setContactOpen(true), []);
