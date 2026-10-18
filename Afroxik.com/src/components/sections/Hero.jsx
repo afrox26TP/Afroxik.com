@@ -37,13 +37,13 @@ export default function Hero({ ref, profile, onContact }) {
         </p>
 
         <div className="hero__actions">
-          <a className="pill-button pill-button--blue" href="#projects">
-            <span className="pill-button__chip">{t.sections.projects}</span>
+          <a className="pill-button pill-button--blue liquid liquid--glass" href="#projects">
+            <span className="pill-button__chip liquid liquid--metal">{t.sections.projects}</span>
             <span className="pill-button__label">{t.hero.projects}</span>
             <IconArrowRight className="pill-button__arrow" />
           </a>
-          <button type="button" className="pill-button pill-button--violet" onClick={onContact}>
-            <span className="pill-button__chip">{t.sections.contact}</span>
+          <button type="button" className="pill-button pill-button--violet liquid liquid--glass" onClick={onContact}>
+            <span className="pill-button__chip liquid liquid--metal">{t.sections.contact}</span>
             <span className="pill-button__label">{t.hero.contact}</span>
             <IconArrowRight className="pill-button__arrow" />
           </button>

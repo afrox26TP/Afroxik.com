@@ -1344,7 +1344,7 @@ section[id] {
   border-radius: inherit;
   padding: 1px;
   pointer-events: none;
-  background: linear-gradient(135deg, rgba(255, 255, 255, 0.9), rgba(255, 255, 255, 0.14) 36%, rgba(255, 255, 255, 0.04) 64%, rgba(170, 220, 255, 0.6));
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.9), rgba(255, 255, 255, 0.14) 36%, rgba(255, 255, 255, 0.04) 64%, var(--lq-rim, rgba(170, 220, 255, 0.6)));
   -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
   -webkit-mask-composite: xor;
   mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
@@ -1394,10 +1394,36 @@ section[id] {
 .pill-button.liquid--glass {
   --lq-tint: rgba(77, 143, 255, 0.12);
   --lq-blur: 14px;
+  gap: 0.85rem;
+  padding: 0.45rem 1.5rem 0.45rem 0.45rem;
+}
+
+.pill-button.liquid--glass .pill-button__chip {
+  padding: 0.55rem 1.25rem;
 }
 
 .pill-button.liquid--glass:hover {
   background-color: rgba(77, 143, 255, 0.2);
+}
+
+/* Fialová varianta (Kontakt v úvodu): fialové sklo a fialový kov. */
+.pill-button--violet.liquid--glass {
+  --lq-tint: rgba(139, 105, 255, 0.12);
+  --lq-halo: rgba(108, 75, 255, 0.45);
+  --lq-glow: rgba(196, 178, 255, 0.55);
+  --lq-rim: rgba(205, 190, 255, 0.6);
+}
+
+.pill-button--violet.liquid--glass:hover {
+  background-color: rgba(139, 105, 255, 0.2);
+}
+
+.pill-button--violet .liquid--metal {
+  --lq-glow: rgba(214, 200, 255, 0.85);
+  --lq-halo: rgba(108, 75, 255, 0.6);
+  --lq-rim: rgba(214, 200, 255, 0.7);
+  text-shadow: 0 1px 1px rgba(40, 12, 110, 0.55);
+  background: linear-gradient(180deg, #c3adff 0%, #9a7bff 40%, #6c48f0 49%, #5a36d8 51%, #7552ff 74%, #b49cff 100%);
 }
 
 /* Kapka uvnitř tlačítka se při najetí natáhne k šipce, jako by tekla. */
