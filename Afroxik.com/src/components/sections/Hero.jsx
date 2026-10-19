@@ -41,7 +41,7 @@ export default function Hero({ ref, profile, onContact, lowMotion }) {
           <a className="pill-button metal-pill" href="#projects">
             <MetalLayer still={lowMotion} />
             <span className="metal-pill__core">
-              <span className="pill-button__chip">{t.sections.projects}</span>
+              <span className="pill-button__chip metal-ink">{t.sections.projects}</span>
               <span className="pill-button__label">{t.hero.projects}</span>
               <IconArrowRight className="pill-button__arrow" />
             </span>
@@ -49,7 +49,7 @@ export default function Hero({ ref, profile, onContact, lowMotion }) {
           <button type="button" className="pill-button metal-pill metal-pill--violet" onClick={onContact}>
             <MetalLayer tone="amethyst" still={lowMotion} />
             <span className="metal-pill__core">
-              <span className="pill-button__chip">{t.sections.contact}</span>
+              <span className="pill-button__chip metal-ink">{t.sections.contact}</span>
               <span className="pill-button__label">{t.hero.contact}</span>
               <IconArrowRight className="pill-button__arrow" />
             </span>
