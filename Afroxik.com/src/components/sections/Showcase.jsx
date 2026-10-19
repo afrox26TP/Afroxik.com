@@ -148,7 +148,7 @@ export default function Showcase({ project, lowMotion, embed = false, playing = 
                   <button type="button" className="pill-button metal-pill" onClick={playing ? stopGame : startGame}>
                     <MetalLayer still={lowMotion} />
                     <span className="metal-pill__core">
-                      <span className="pill-button__chip">{playing ? t.showcase.close : t.showcase.play.chip}</span>
+                      <span className="pill-button__chip metal-ink">{playing ? t.showcase.close : t.showcase.play.chip}</span>
                       <span className="pill-button__label">{playing ? t.showcase.closeLabel : t.showcase.play.label}</span>
                       {playing ? <IconClose className="pill-button__arrow" /> : <IconPlay className="pill-button__arrow" />}
                     </span>
@@ -157,7 +157,7 @@ export default function Showcase({ project, lowMotion, embed = false, playing = 
                   <a className="pill-button metal-pill" href={showcase.play} target="_blank" rel="noreferrer">
                     <MetalLayer still={lowMotion} />
                     <span className="metal-pill__core">
-                      <span className="pill-button__chip">{t.showcase.play.chip}</span>
+                      <span className="pill-button__chip metal-ink">{t.showcase.play.chip}</span>
                       <span className="pill-button__label">{t.showcase.play.label}</span>
                       <IconArrowUpRight className="pill-button__arrow" />
                     </span>
