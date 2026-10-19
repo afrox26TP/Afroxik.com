@@ -22,15 +22,6 @@ function timeAgo(date, locale) {
   return new Intl.RelativeTimeFormat(locale, { numeric: "auto" }).format(Math.round(days / size), unit);
 }
 
-// Světelný kužel sleduje kurzor nad kartou (inspirace Streamally).
-function trackSpotlight(event) {
-  const card = event.target.closest?.(".project-card");
-  if (!card) return;
-  const rect = card.getBoundingClientRect();
-  card.style.setProperty("--mx", `${event.clientX - rect.left}px`);
-  card.style.setProperty("--my", `${event.clientY - rect.top}px`);
-}
-
 function ProjectCard({ project }) {
   const t = useT();
 
@@ -124,9 +115,15 @@ export default function Projects({ projects, githubUrl, fullFx }) {
             </a>
           </div>
         ) : (
-          <div className="project-grid" onPointerMove={fullFx ? trackSpotlight : undefined}>
+          <div className="project-grid">
             {gridProjects.map((project, index) => (
-              <Reveal key={project.id} mode="self" className="project-cell" style={{ "--delay": `${(index % 3) * 90}ms` }}>
+              <Reveal
+                key={project.id}
+                mode="self"
+                className="project-cell"
+                style={{ "--delay": `${(index % 3) * 90}ms` }}
+                data-tilt="7"
+              >
                 <BorderGlow
                   disabled={!fullFx}
                   borderRadius={20}

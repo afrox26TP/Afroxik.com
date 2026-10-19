@@ -12,7 +12,7 @@ export function WarpOverlayDemo({ socials, copiedKey, onCopy }) {
         const ActionIcon = social.copy ? (copied ? IconCheck : IconCopy) : IconArrowUpRight;
         const content = (
           <>
-            <span className="warp-contact-icon">
+            <span className={`warp-contact-icon warp-contact-icon--${social.id}`}>
               <Icon />
             </span>
             <span className="warp-contact-text">
@@ -26,7 +26,7 @@ export function WarpOverlayDemo({ socials, copiedKey, onCopy }) {
         );
 
         return (
-          <li key={social.id}>
+          <li key={social.id} data-tilt="8">
             {social.copy ? (
               <button
                 type="button"

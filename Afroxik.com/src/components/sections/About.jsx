@@ -1,5 +1,6 @@
 import Reveal from "../ui/Reveal";
 import { IconArrowRight, IconCheck, IconGamepad, IconGithub, socialIcons } from "../ui/icons";
+import VoxelText from "../ui/VoxelText";
 import { useT } from "../../lib/i18n";
 
 // V rámečku je buď znak (glyph), nebo obsah předaný jako children (avatar).
@@ -35,12 +36,12 @@ export default function About({ profile, socials, toolbox, projects, copiedKey, 
         <Reveal className="section__head section__head--center">
           <span className="kicker">{t.sections.about}</span>
           <h2 id="about-title" className="section__title">
-            {t.about.title[0]} <span className="glow">{t.about.title[1]}</span>
+            {t.about.title[0]} <VoxelText className="voxel--glow">{t.about.title[1]}</VoxelText>
           </h2>
         </Reveal>
 
         <div className="about-grid">
-          <Reveal mode="self">
+          <Reveal mode="self" data-tilt="5">
             <article className="hud-card">
               <HudStage tag="player_01">
                 <img
@@ -97,7 +98,7 @@ export default function About({ profile, socials, toolbox, projects, copiedKey, 
             </article>
           </Reveal>
 
-          <Reveal mode="self" style={{ "--delay": "90ms" }}>
+          <Reveal mode="self" style={{ "--delay": "90ms" }} data-tilt="5">
             <article className="hud-card hud-card--join">
               <HudStage tag={t.about.joinTag} glyph="?" />
               <div className="hud-card__body">
@@ -119,7 +120,9 @@ export default function About({ profile, socials, toolbox, projects, copiedKey, 
           {stats.map((stat) => (
             <div key={stat.label} className="stat">
               <dt className="stat__label">{stat.label}</dt>
-              <dd className="stat__value">{stat.value}</dd>
+              <dd className="stat__value">
+                <VoxelText>{stat.value}</VoxelText>
+              </dd>
             </div>
           ))}
         </Reveal>
@@ -132,7 +135,7 @@ export default function About({ profile, socials, toolbox, projects, copiedKey, 
           <ul className="toolbox__list">
             {toolbox.map((tool, index) => (
               <li key={tool} className="tool-pill" style={{ "--i": index }}>
-                {tool}
+                <span className="tool-pill__cap">{tool}</span>
               </li>
             ))}
           </ul>

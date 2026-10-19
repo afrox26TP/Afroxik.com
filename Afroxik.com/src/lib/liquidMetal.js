@@ -42,6 +42,7 @@ uniform float u_soft;
 uniform float u_disp;
 uniform float u_dist;
 uniform float u_scale;
+uniform float u_sphere;
 out vec4 outColor;
 
 vec3 mod289(vec3 x) { return x - floor(x * (1.0 / 289.0)) * 289.0; }
@@ -76,7 +77,31 @@ float stripe(float coord) {
   return smoothstep(0.5 - u_soft, 0.5 + u_soft, tri);
 }
 
+// Koule (tón sphere): normála z bodu na disku a odraz pohledu do prostředí z pruhů. Šum vlní normálu, takže odraz
+// teče jako hladina tekutého kovu; pruhy se samy ohnou kolem koule a horizont objede okraj jako na chromové kouli.
+vec3 sphereColor(float t) {
+  vec2 p = gl_FragCoord.xy / u_res * 2.0 - 1.0;
+  float z = sqrt(max(0.0, 1.0 - dot(p, p)));
+  vec2 wobble = vec2(snoise(p * 1.4 + vec2(0.0, -t * 0.3)), snoise(p * 1.4 + vec2(4.7, t * 0.26)));
+  vec3 n = normalize(vec3(p + wobble * u_dist * 0.4, max(z, 0.05)));
+  vec3 r = reflect(vec3(0.0, 0.0, -1.0), n);
+  float coord = r.y * u_rep + 0.25 * snoise(r.xz * 1.5 + vec2(t * 0.12, 0.0)) * u_dist - t * 0.12;
+  vec3 col = vec3(
+    mix(u_dark.r, u_light.r, stripe(coord + u_disp)),
+    mix(u_dark.g, u_light.g, stripe(coord)),
+    mix(u_dark.b, u_light.b, stripe(coord - u_disp))
+  );
+  // Spodní polovina odráží modrou scénu webu, okraj se zesvětlí (Fresnel).
+  col = mix(col, col * vec3(0.55, 0.78, 1.3), (1.0 - smoothstep(-0.7, 0.05, r.y)) * 0.7);
+  col += pow(1.0 - z, 3.0) * 0.22;
+  return col;
+}
+
 void main() {
+  if (u_sphere > 0.5) {
+    outColor = vec4(sphereColor(u_time), 1.0);
+    return;
+  }
   vec2 uv = (gl_FragCoord.xy / u_res - 0.5);
   uv.x *= u_res.x / u_res.y;
   uv /= max(u_scale, 0.001);
@@ -100,6 +125,8 @@ void main() {
 export const METAL_TONES = {
   silver: { light: "#f8fafc", dark: "#23262b", repetition: 1.8, angle: 68, softness: 0.34, dispersion: 0.03, distortion: 0.3, scale: 1.4 },
   amethyst: { light: "#e8d6ff", dark: "#2c1854", repetition: 1.8, angle: 70, softness: 0.34, dispersion: 0.03, distortion: 0.3, scale: 1.4 },
+  // Koule v úvodu: místo plochých pruhů odraz na kouli (sphereColor v shaderu), pruhy jsou „světla ve studiu“.
+  sphere: { sphere: true, light: "#f4f8ff", dark: "#1b2540", repetition: 1.2, angle: 0, softness: 0.18, dispersion: 0.03, distortion: 0.3, scale: 1 },
 };
 
 function hexToRgb(hex) {
@@ -135,6 +162,7 @@ export function mountMetal(canvas, params) {
   const uniforms = {
     res: u("u_res"), time: u("u_time"), light: u("u_light"), dark: u("u_dark"), rep: u("u_rep"),
     angle: u("u_angle"), soft: u("u_soft"), disp: u("u_disp"), dist: u("u_dist"), scale: u("u_scale"),
+    sphere: u("u_sphere"),
   };
 
   let p = { speed: 0, ...params };
@@ -167,6 +195,7 @@ export function mountMetal(canvas, params) {
     gl.uniform1f(uniforms.disp, p.dispersion);
     gl.uniform1f(uniforms.dist, p.distortion);
     gl.uniform1f(uniforms.scale, p.scale);
+    gl.uniform1f(uniforms.sphere, p.sphere ? 1 : 0);
     gl.drawArrays(gl.TRIANGLES, 0, 3);
     if (p.speed > 0) raf = requestAnimationFrame(draw);
   }

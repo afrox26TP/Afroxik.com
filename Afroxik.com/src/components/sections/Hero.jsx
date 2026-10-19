@@ -1,5 +1,6 @@
 import { IconArrowRight } from "../ui/icons";
 import MetalLayer from "../ui/MetalLayer";
+import VoxelText from "../ui/VoxelText";
 import { useT } from "../../lib/i18n";
 
 export default function Hero({ ref, profile, onContact, lowMotion }) {
@@ -10,16 +11,19 @@ export default function Hero({ ref, profile, onContact, lowMotion }) {
       <div className="hero__inner">
         <span className="kicker kicker--accent hero__kicker">{profile.role}</span>
 
+        {/* Nadpis a štítky jsou jedna 3D scéna: natáčí se za kurzorem, štítky visí před nadpisem v různé hloubce. */}
         <div className="hero__title-wrap">
-          <h1 id="hero-title" className="hero__name">
-            {profile.name}
-          </h1>
-          <div className="hero__tags" aria-hidden="true">
-            {profile.heroTags.map((tag, index) => (
-              <span key={tag} className={`hero-tag hero-tag--${index + 1}`}>
-                <span>{tag}</span>
-              </span>
-            ))}
+          <div className="hero__stage" data-parallax="">
+            <h1 id="hero-title" className="hero__name">
+              <VoxelText>{profile.name}</VoxelText>
+            </h1>
+            <div className="hero__tags" aria-hidden="true">
+              {profile.heroTags.map((tag, index) => (
+                <span key={tag} className={`hero-tag hero-tag--${index + 1}`}>
+                  <span className="hero-tag__glass">{tag}</span>
+                </span>
+              ))}
+            </div>
           </div>
         </div>
 

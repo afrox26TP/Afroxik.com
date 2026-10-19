@@ -28,11 +28,29 @@ function englishHtml() {
   }
 }
 
+// Vývojový server na /play/ vrací index.html webu (SPA), ne hru. Cloudflare v produkci servíruje
+// play/index.html sám, tady se adresa jen přepíše, ať jde hra v showcase vyzkoušet i lokálně.
+function servePlayIndex() {
+  return {
+    name: 'serve-play-index',
+    apply: 'serve',
+    configureServer(server) {
+      server.middlewares.use((req, _res, next) => {
+        if (req.url === '/play/' || req.url?.startsWith('/play/?')) {
+          req.url = req.url.replace('/play/', '/play/index.html')
+        }
+        next()
+      })
+    },
+  }
+}
+
 // https://vite.dev/config/
 export default defineConfig({
   plugins: [
     react(),
     englishHtml(),
+    servePlayIndex(),
   ],
   publicDir: 'Afroxik.com/public',
   resolve: {

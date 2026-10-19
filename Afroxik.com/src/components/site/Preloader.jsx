@@ -1,7 +1,9 @@
 import { useEffect, useRef, useState } from "react";
+import Cube3d from "../ui/Cube3d";
 import { useT } from "../../lib/i18n";
 
-// Úvodní loader s procenty (inspirace Lepshee). Procenta plynule dohánějí skutečný stav načítání.
+// Úvodní loader s procenty (inspirace Lepshee) a točící se skleněnou kostkou. Procenta plynule dohánějí
+// skutečný stav načítání.
 export default function Preloader({ progress, done, name }) {
   const t = useT();
   const rootRef = useRef(null);
@@ -62,6 +64,9 @@ export default function Preloader({ progress, done, name }) {
       aria-label={t.preloader.label}
     >
       <div className="preloader__inner">
+        <div className="preloader__cube" aria-hidden="true">
+          <Cube3d />
+        </div>
         <p className="preloader__title">
           {t.preloader.title} <span>{name}</span>
         </p>

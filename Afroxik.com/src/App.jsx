@@ -11,6 +11,7 @@ import {
 import { LangContext, texts } from "./lib/i18n";
 import { IS_LOW_END, PREFERS_REDUCED_MOTION } from "./lib/device";
 import { initLiquidRefraction } from "./lib/liquidRefraction";
+import { initPointer3d } from "./lib/pointer3d";
 import { useParticles } from "./hooks/useParticles";
 import { useCopy } from "./hooks/useCopy";
 import { useInView } from "./hooks/useInView";
@@ -121,6 +122,8 @@ export default function App() {
     performanceMode === "low" ? true : performanceMode === "high" ? false : IS_LOW_END;
   const shouldUseFullFx = !useLowPerformanceMode && !isCompactViewport && !isCoarsePointer;
   const lowMotion = PREFERS_REDUCED_MOTION || useLowPerformanceMode;
+  // Naklápění karet a paralaxa úvodu za kurzorem – jen myš, plné efekty a bez omezených animací.
+  const use3d = shouldUseFullFx && !PREFERS_REDUCED_MOTION;
   const embedGame = !isCompactViewport && !isCoarsePointer;
   const gameActive = gamePlaying && embedGame;
 
@@ -229,6 +232,8 @@ export default function App() {
 
   useEffect(() => initLiquidRefraction(), []);
 
+  useEffect(() => (use3d ? initPointer3d() : undefined), [use3d]);
+
   const handlePlasmaReady = useCallback(() => markReady("plasma"), [markReady]);
   const openContact = useCallback(() => setContactOpen(true), []);
 
@@ -244,6 +249,7 @@ export default function App() {
     "fx-page",
     useLowPerformanceMode && "low-end",
     shouldUseFullFx && "fx-full",
+    use3d && "fx-3d",
     isContentReady && "is-ready",
   ]
     .filter(Boolean)
@@ -311,7 +317,7 @@ export default function App() {
             onContact={openContact}
             lowMotion={lowMotion}
           />
-          <Contact socials={socials} copiedKey={copiedKey} onCopy={copy} onContact={openContact} />
+          <Contact socials={socials} copiedKey={copiedKey} onCopy={copy} onContact={openContact} lowMotion={lowMotion} />
         </main>
 
         <SiteFooter

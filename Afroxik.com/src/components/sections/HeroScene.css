@@ -1,0 +1,318 @@
+/* 3D objekty kolem nadpisu v úvodu (HeroScene.jsx) – zatím vypnuté, do buildu se dostanou až s komponentou.
+   Kostka sama (.cube3d) je v index.css, používá ji i preloader. */
+
+/* ── 3D objekty v úvodu ── Každý se při pohybu myši posune podle své hloubky (--depth: kladná = blíž,
+   záporná = za nadpisem) a pomalu se vznáší. */
+.hero-scene {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+}
+
+.hero-obj {
+  position: absolute;
+  left: var(--x);
+  top: var(--y);
+  width: var(--size);
+  aspect-ratio: 1;
+  opacity: 0;
+  transform: translate3d(calc(var(--px, 0) * var(--depth) * 110px), calc(var(--py, 0) * var(--depth) * 70px), 0);
+  transition: opacity 1400ms ease 500ms;
+}
+
+.is-ready .hero-obj {
+  opacity: 1;
+}
+
+.hero-obj > * {
+  animation: objFloat 9s ease-in-out infinite;
+  animation-delay: var(--float, 0s);
+}
+
+.hero-obj--orb { --x: 5%; --y: 55%; --size: clamp(6.5rem, 12vw, 11rem); --depth: 1.2; --float: -2s; }
+.hero-obj--metal { --x: 85%; --y: 16%; --size: clamp(3rem, 5.4vw, 5.2rem); --depth: 0.7; --float: -6s; }
+.hero-obj--gyro { --x: 81%; --y: 57%; --size: clamp(6rem, 10vw, 9.5rem); --depth: -0.5; --float: -4s; perspective: 700px; }
+.hero-obj--cube { --x: 13%; --y: 19%; --size: clamp(3.2rem, 5.2vw, 5rem); --depth: 0.9; --float: -1s; perspective: 600px; }
+
+.orb {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+}
+
+/* Křišťálová koule: lom pozadí a stín uvnitř, v ní se točí tečkovaný globus a navrchu je lesk skla. */
+.orb--glass {
+  box-shadow:
+    inset -14px -18px 34px rgba(18, 46, 130, 0.5),
+    inset 10px 12px 26px rgba(255, 255, 255, 0.14),
+    0 36px 60px -28px rgba(0, 0, 0, 0.75);
+  -webkit-backdrop-filter: blur(3px) saturate(1.5) brightness(1.18);
+  backdrop-filter: blur(3px) saturate(1.5) brightness(1.18);
+}
+
+/* Slabá záře ve středu, ze které globus „svítí“. */
+.orb--glass::before {
+  content: "";
+  position: absolute;
+  inset: 24%;
+  border-radius: 50%;
+  background: radial-gradient(closest-side, rgba(124, 236, 255, 0.32), rgba(89, 168, 255, 0.08) 70%, transparent);
+}
+
+/* Odlesk vlevo nahoře, kaustika vpravo dole a světlý okraj (Fresnel) – leží nad globusem, ten je tak „uvnitř“. */
+.orb__shine {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  background:
+    radial-gradient(circle at 30% 24%, rgba(255, 255, 255, 0.95) 0, rgba(255, 255, 255, 0.55) 3.5%, rgba(255, 255, 255, 0) 15%),
+    radial-gradient(circle at 70% 80%, rgba(150, 240, 255, 0.5) 0, rgba(124, 236, 255, 0.1) 22%, rgba(124, 236, 255, 0) 40%),
+    radial-gradient(closest-side, rgba(89, 168, 255, 0) 0 62%, rgba(124, 190, 255, 0.22) 84%, rgba(210, 236, 255, 0.55) 97%, rgba(255, 255, 255, 0) 100%);
+}
+
+/* Globus: poledníky a rovnoběžky z teček (tečkovaný okraj kruhu), otáčí se kolem nakloněné osy jako Země. */
+.globe {
+  --r: calc(var(--size) * 0.34);
+  position: absolute;
+  inset: 0;
+  perspective: calc(var(--size) * 4);
+}
+
+.globe__spin {
+  position: absolute;
+  inset: 0;
+  transform-style: preserve-3d;
+  transform: rotateX(-14deg) rotateZ(18deg) rotateY(0deg);
+  animation: globeSpin 18s linear infinite;
+}
+
+.globe__meridian,
+.globe__parallel {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  border-radius: 50%;
+  border: 2px dotted rgba(170, 244, 255, 0.95);
+}
+
+.globe__meridian {
+  width: calc(var(--r) * 2);
+  height: calc(var(--r) * 2);
+  margin: calc(var(--r) * -1) 0 0 calc(var(--r) * -1);
+  transform: rotateY(var(--a));
+}
+
+.globe__parallel {
+  width: calc(var(--r) * 2 * var(--c));
+  height: calc(var(--r) * 2 * var(--c));
+  margin: calc(var(--r) * -1 * var(--c)) 0 0 calc(var(--r) * -1 * var(--c));
+  border-color: rgba(124, 190, 255, 0.75);
+  transform: translateY(calc(var(--r) * var(--s))) rotateX(90deg);
+}
+
+/* Koule z tekutého kovu: teče v ní stejný WebGL kov jako v tlačítkách (MetalLayer, tón sphere), navrchu je
+   stínování koule. Bez WebGL zůstane statická chromová koule z gradientu. */
+.orb--metal {
+  overflow: hidden;
+  isolation: isolate;
+  box-shadow: 0 26px 40px -16px rgba(0, 0, 0, 0.75), 0 0 30px -6px rgba(124, 180, 255, 0.35);
+}
+
+.orb--metal .metal-layer {
+  background:
+    radial-gradient(120% 60% at 50% 108%, rgba(89, 168, 255, 0.85), rgba(89, 168, 255, 0) 60%),
+    linear-gradient(176deg, #f7faff 0%, #d4dcea 30%, #8e9ab0 45%, #1a2131 51%, #39435a 60%, #a9b5c9 80%, #e7edf7 100%);
+}
+
+/* Odraz a modrou spodní polovinu kreslí shader, tady je jen ostrý odlesk lampy a lehké ztmavení u okraje. */
+.orb__shade {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  border-radius: 50%;
+  background:
+    radial-gradient(circle at 33% 27%, rgba(255, 255, 255, 0.95) 0, rgba(255, 255, 255, 0.5) 4%, rgba(255, 255, 255, 0) 14%),
+    radial-gradient(closest-side, rgba(0, 0, 0, 0) 70%, rgba(4, 7, 16, 0.4) 100%);
+  box-shadow:
+    inset -5px -7px 14px rgba(0, 0, 0, 0.4),
+    inset 0 0 0 1px rgba(255, 255, 255, 0.14);
+}
+
+/* Gyroskop: tři kovové prstence (každý ze čtyř vrstev kvůli tloušťce) se točí kolem různých os, uprostřed
+   pulzuje zářící jádro. */
+.gyro {
+  position: absolute;
+  inset: 0;
+  transform-style: preserve-3d;
+  transform: rotateX(-14deg) rotateY(20deg);
+}
+
+.gyro__ring {
+  position: absolute;
+  inset: 0;
+  transform-style: preserve-3d;
+}
+
+.gyro__ring--a {
+  transform: rotateY(60deg);
+  animation: gyroA 8s linear infinite;
+}
+
+.gyro__ring--b {
+  inset: 13%;
+  transform: rotateX(70deg);
+  animation: gyroB 11s linear infinite;
+}
+
+.gyro__ring--c {
+  inset: 26%;
+  transform: rotateZ(45deg) rotateY(30deg);
+  animation: gyroC 6s linear infinite;
+}
+
+.gyro__ring i {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  background: conic-gradient(from var(--from, 0deg), #f2f7ff, #7e9be0, #1c2b57, #a5bdf2, #f6f9ff, #5d7ac8, #17244a, #bcd0f6, #f2f7ff);
+  -webkit-mask: radial-gradient(closest-side, transparent 80%, #000 82%, #000 97%, transparent 100%);
+  mask: radial-gradient(closest-side, transparent 80%, #000 82%, #000 97%, transparent 100%);
+  transform: translateZ(calc(var(--layer) * 1.5px));
+  filter: brightness(var(--b));
+}
+
+.gyro__ring i:nth-child(1) { --layer: -1.5; --b: 0.4; }
+.gyro__ring i:nth-child(2) { --layer: -0.5; --b: 0.6; }
+.gyro__ring i:nth-child(3) { --layer: 0.5; --b: 0.8; }
+.gyro__ring i:nth-child(4) { --layer: 1.5; --b: 1; }
+.gyro__ring--b i { --from: 120deg; }
+.gyro__ring--c i { --from: 240deg; }
+
+.gyro__core {
+  position: absolute;
+  inset: 39%;
+  border-radius: 50%;
+  background: radial-gradient(circle at 38% 32%, #ffffff 0 10%, #a6f4ff 26%, #59a8ff 58%, #3448c8 100%);
+  box-shadow: 0 0 14px rgba(124, 236, 255, 0.85), 0 0 36px rgba(89, 168, 255, 0.55);
+  animation: corePulse 2.8s ease-in-out infinite;
+}
+
+.hero-obj .cube3d {
+  animation: cubeSpin 22s linear infinite, objFloat 9s ease-in-out infinite;
+  animation-delay: 0s, var(--float, 0s);
+}
+
+/* Slabé zařízení a omezené animace: objekty stojí, sklo koule je bez lomu. */
+.low-end .orb--glass {
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+}
+
+.low-end .hero-obj > *,
+.low-end .hero-obj .cube3d,
+.low-end .globe__spin,
+.low-end .gyro__ring,
+.low-end .gyro__core {
+  animation: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hero-obj > *,
+  .hero-obj .cube3d,
+  .globe__spin,
+  .gyro__ring,
+  .gyro__core {
+    animation: none;
+  }
+}
+
+/* Na výšku je obsah úvodu vyšší, tak koule a gyroskop sjedou pod řadu tlačítek. */
+@media (max-width: 900px) {
+  .hero-obj--orb {
+    --x: 1%;
+    --y: 71%;
+  }
+
+  .hero-obj--gyro {
+    --x: 80%;
+    --y: 73%;
+  }
+}
+
+/* Na úzkém displeji zůstanou jen dvě koule u okrajů, ať nezakrývají text. */
+@media (max-width: 720px) {
+  .hero-obj--gyro,
+  .hero-obj--cube {
+    display: none;
+  }
+
+  .hero-obj--orb {
+    --x: -10%;
+    --y: 77%;
+    --size: 7rem;
+  }
+
+  .hero-obj--metal {
+    --x: 83%;
+    --y: 12%;
+    --size: 3rem;
+  }
+}
+
+@keyframes objFloat {
+  0%,
+  100% {
+    translate: 0 0;
+  }
+  50% {
+    translate: 0 -14px;
+  }
+}
+
+@keyframes globeSpin {
+  from {
+    transform: rotateX(-14deg) rotateZ(18deg) rotateY(0deg);
+  }
+  to {
+    transform: rotateX(-14deg) rotateZ(18deg) rotateY(360deg);
+  }
+}
+
+/* Prstence gyroskopu začínají ve stejné poloze, ve které stojí bez animace. */
+@keyframes gyroA {
+  from {
+    transform: rotateY(60deg);
+  }
+  to {
+    transform: rotateY(420deg);
+  }
+}
+
+@keyframes gyroB {
+  from {
+    transform: rotateX(70deg);
+  }
+  to {
+    transform: rotateX(430deg);
+  }
+}
+
+@keyframes gyroC {
+  from {
+    transform: rotateZ(45deg) rotateY(30deg);
+  }
+  to {
+    transform: rotateZ(45deg) rotateY(-330deg);
+  }
+}
+
+@keyframes corePulse {
+  0%,
+  100% {
+    scale: 0.88;
+  }
+  50% {
+    scale: 1.08;
+  }
+}

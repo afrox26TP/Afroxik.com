@@ -73,6 +73,26 @@
 
   --cursor-cookie: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='20' height='20' viewBox='0 0 20 20'%3E%3Ccircle cx='10' cy='10' r='7' fill='none' stroke='%23ffffff' stroke-width='1.5'/%3E%3C/svg%3E") 10 10, auto;
   --cursor-cookie-pointer: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='20' height='20' viewBox='0 0 20 20'%3E%3Ccircle cx='10' cy='10' r='7' fill='none' stroke='%2359a8ff' stroke-width='1.5'/%3E%3C/svg%3E") 10 10, pointer;
+
+  /* ── 3D materiály ── Světlo svítí zleva shora: horní hrany se lesknou, spodní tmavnou, stíny padají dolů. */
+  --glass-sheen: linear-gradient(165deg, rgba(255, 255, 255, 0.09) 0%, rgba(255, 255, 255, 0.025) 32%, rgba(255, 255, 255, 0.01) 64%, rgba(124, 180, 255, 0.05) 100%);
+  --glass-edges:
+    inset 0 1px 0 rgba(255, 255, 255, 0.2),
+    inset 1px 0 0 rgba(255, 255, 255, 0.05),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.42),
+    inset -1px 0 0 rgba(0, 0, 0, 0.16);
+  /* Okraj skla chytá světlo vlevo nahoře a odraz oblohy vpravo dole. */
+  --rim: linear-gradient(150deg, rgba(255, 255, 255, 0.5), rgba(255, 255, 255, 0.1) 24%, rgba(255, 255, 255, 0) 48%, rgba(124, 180, 255, 0.1) 76%, rgba(124, 236, 255, 0.38));
+  --depth-sm: 0 1px 1px rgba(0, 0, 0, 0.3), 0 6px 14px -6px rgba(0, 0, 0, 0.65);
+  --depth-md: 0 2px 4px rgba(0, 0, 0, 0.25), 0 14px 28px -10px rgba(0, 0, 0, 0.55), 0 34px 60px -30px rgba(0, 0, 0, 0.6);
+  --depth-lg: 0 3px 6px rgba(0, 0, 0, 0.22), 0 24px 48px -16px rgba(0, 0, 0, 0.6), 0 60px 100px -40px rgba(0, 0, 0, 0.7);
+  /* Neumorfismus: vystouplé a vtlačené ovládání na tmavém skle. */
+  --soft-hi: rgba(150, 190, 255, 0.1);
+  --soft-lo: rgba(0, 3, 12, 0.62);
+  --raised: -3px -3px 8px var(--soft-hi), 4px 5px 11px var(--soft-lo), inset 0 1px 0 rgba(255, 255, 255, 0.1);
+  --pressed: inset 3px 3px 7px var(--soft-lo), inset -2px -2px 6px var(--soft-hi);
+  /* Jemné zrno matného skla. */
+  --noise: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0.06 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
 }
 
 /* ══ BASE ═══════════════════════════════ */
@@ -303,6 +323,32 @@ section[id] {
   text-align: center;
 }
 
+.preloader__cube {
+  --size: 76px;
+  position: relative;
+  width: var(--size);
+  height: var(--size);
+  margin: 0 auto 2.6rem;
+  perspective: 520px;
+}
+
+.preloader__cube .cube3d {
+  animation-duration: 7s;
+}
+
+/* Stín kostky na „podlaze“. */
+.preloader__cube::after {
+  content: "";
+  position: absolute;
+  left: 8%;
+  right: 8%;
+  bottom: -1.6rem;
+  height: 14px;
+  border-radius: 50%;
+  background: radial-gradient(closest-side, rgba(89, 168, 255, 0.35), transparent);
+  filter: blur(3px);
+}
+
 .preloader__title {
   font-family: var(--font-display);
   font-weight: 700;
@@ -315,23 +361,33 @@ section[id] {
   color: #ffffff;
 }
 
+/* Vtlačená drážka a v ní lesklá „tekutina“ v barvách webu. */
 .preloader__line {
   position: relative;
-  height: 4px;
+  height: 14px;
   margin: 2rem 0 1.25rem;
-  overflow: hidden;
   border-radius: 999px;
-  background: rgba(255, 255, 255, 0.1);
+  background: rgba(0, 3, 14, 0.6);
+  box-shadow: var(--pressed), 0 1px 0 rgba(255, 255, 255, 0.06);
 }
 
 .preloader__fill {
   position: absolute;
-  inset: 0;
-  transform-origin: 0 50%;
-  transform: scaleX(var(--progress, 0));
+  inset: 3px;
+  border-radius: inherit;
+  clip-path: inset(0 calc(100% - var(--progress, 0) * 100%) 0 0 round 999px);
   background: var(--grad-brand);
   background-size: 200% 100%;
+  box-shadow: inset 0 -2px 3px rgba(0, 0, 0, 0.25), 0 0 14px rgba(89, 168, 255, 0.55);
   animation: colorLine 2.5s linear infinite;
+}
+
+.preloader__fill::after {
+  content: "";
+  position: absolute;
+  inset: 1px 6px 50%;
+  border-radius: inherit;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.6), rgba(255, 255, 255, 0));
 }
 
 .preloader__percent {
@@ -377,6 +433,100 @@ section[id] {
 
 .dim {
   color: var(--text-dim);
+}
+
+/* Vytlačené písmo: tečky Doto dostanou hloubku jako malé kostičky. Vrstvy jdou šikmo dolů (světlo je vlevo
+   nahoře) a tmavnou směrem dozadu. */
+.section__title,
+.section__title .dim,
+.showcase__title,
+.warp-dialog-title,
+.hud-card__name,
+.project-card__title,
+.brand__name,
+.mobile-menu__link,
+.preloader__title,
+.preloader__percent {
+  text-shadow:
+    0.003em 0.016em 0 var(--ex-1, #a9bde4),
+    0.006em 0.032em 0 var(--ex-2, #7088bb),
+    0.009em 0.048em 0 var(--ex-3, #485f93),
+    0.012em 0.064em 0 var(--ex-4, #2c4170),
+    0.015em 0.08em 0 var(--ex-5, #1b2b52),
+    0.016em 0.09em 0.04em rgba(0, 3, 15, 0.7),
+    0.03em 0.18em 0.3em rgba(0, 3, 15, 0.5);
+}
+
+/* Tlumený text má i tmavší bočnice, jinak by bok svítil víc než čelo. */
+.section__title .dim,
+.mobile-menu__link,
+.preloader__title {
+  --ex-1: #56698f;
+  --ex-2: #415274;
+  --ex-3: #303e5b;
+  --ex-4: #222d44;
+  --ex-5: #171f31;
+}
+
+/* Voxelový text s barevným čelem (components/ui/VoxelText.jsx). Čelo je gradient oříznutý na písmo, hloubku
+   kreslí kopie pod ním: 12 vrstev ve směru --vx-x/--vx-y, nahoře tenká světlá hrana jako zkosení. */
+.voxel {
+  --vx-face: linear-gradient(180deg, #ffffff 0%, #e2efff 45%, #8fbdff 100%);
+  --vx-s1: #4b78d6;
+  --vx-s2: #2f58b0;
+  --vx-s3: #1d3f88;
+  --vx-s4: #102a62;
+  --vx-x: 0.0018em;
+  --vx-y: 0.0068em;
+  position: relative;
+  display: inline-grid;
+}
+
+.voxel > * {
+  grid-area: 1 / 1;
+}
+
+.voxel__depth {
+  color: var(--vx-s1);
+  -webkit-text-fill-color: currentColor;
+  text-shadow:
+    -0.004em -0.004em 0 rgba(225, 240, 255, 0.75),
+    calc(var(--vx-x) * 1) calc(var(--vx-y) * 1) 0 var(--vx-s1),
+    calc(var(--vx-x) * 2) calc(var(--vx-y) * 2) 0 var(--vx-s1),
+    calc(var(--vx-x) * 3) calc(var(--vx-y) * 3) 0 var(--vx-s2),
+    calc(var(--vx-x) * 4) calc(var(--vx-y) * 4) 0 var(--vx-s2),
+    calc(var(--vx-x) * 5) calc(var(--vx-y) * 5) 0 var(--vx-s2),
+    calc(var(--vx-x) * 6) calc(var(--vx-y) * 6) 0 var(--vx-s3),
+    calc(var(--vx-x) * 7) calc(var(--vx-y) * 7) 0 var(--vx-s3),
+    calc(var(--vx-x) * 8) calc(var(--vx-y) * 8) 0 var(--vx-s3),
+    calc(var(--vx-x) * 9) calc(var(--vx-y) * 9) 0 var(--vx-s4),
+    calc(var(--vx-x) * 10) calc(var(--vx-y) * 10) 0 var(--vx-s4),
+    calc(var(--vx-x) * 11) calc(var(--vx-y) * 11) 0 var(--vx-s4),
+    calc(var(--vx-x) * 12) calc(var(--vx-y) * 12) 0 var(--vx-s4),
+    calc(var(--vx-x) * 12) calc(var(--vx-y) * 12 + 0.04em) 0.06em rgba(0, 4, 18, 0.65),
+    calc(var(--vx-x) * 16) calc(var(--vx-y) * 16 + 0.12em) 0.3em rgba(0, 4, 18, 0.5);
+  user-select: none;
+  pointer-events: none;
+}
+
+.voxel__face {
+  background-image: var(--vx-face);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  -webkit-text-fill-color: transparent;
+  text-shadow: none;
+}
+
+/* Druhé slovo nadpisu „Kdo za tím stojí.“ – stejná hloubka jako zbytek nadpisu, barevné čelo. */
+.voxel--glow {
+  --vx-face: linear-gradient(90deg, #a6f4ff, #59a8ff 45%, #b39bff);
+  --vx-s1: #3b5fd6;
+  --vx-s2: #3045a8;
+  --vx-s3: #24317e;
+  --vx-s4: #171f57;
+  --vx-x: 0.0013em;
+  filter: drop-shadow(0 0 22px rgba(89, 168, 255, 0.4));
 }
 
 .letter-swap {
@@ -484,12 +634,16 @@ section[id] {
   gap: 0.4rem;
 }
 
+/* Štítky jsou do povrchu vtlačené (neumorfismus), barva prosvítá ze dna. */
 .tag {
   display: inline-flex;
-  padding: 0.28rem 0.62rem;
+  padding: 0.3rem 0.66rem;
   border-radius: 999px;
-  border: 1px solid color-mix(in srgb, var(--accent-a, #59a8ff) 32%, transparent);
-  background: color-mix(in srgb, var(--accent-a, #59a8ff) 12%, transparent);
+  background: color-mix(in srgb, var(--accent-a, #59a8ff) 10%, rgba(0, 4, 16, 0.45));
+  box-shadow:
+    inset 1px 1px 3px rgba(0, 0, 0, 0.6),
+    inset -1px -1px 2px color-mix(in srgb, var(--accent-a, #59a8ff) 22%, transparent),
+    0 1px 0 rgba(255, 255, 255, 0.06);
   color: color-mix(in srgb, var(--accent-a, #59a8ff) 62%, #ffffff);
   font-size: 0.68rem;
   font-weight: 700;
@@ -520,71 +674,24 @@ section[id] {
   transform: translateX(4px);
 }
 
-/* Barevný přelévající se obrys (inspirace Lepshee). */
-.btn-colorful {
-  position: relative;
-  isolation: isolate;
-  display: inline-flex;
-  align-items: center;
-  padding: 1.05rem 2.2rem;
-  border-radius: 999px;
-  color: var(--text);
-  font-size: 0.85rem;
-  font-weight: 800;
-  letter-spacing: 0.18em;
-  text-transform: uppercase;
-}
-
-.btn-colorful::before {
-  content: "";
-  position: absolute;
-  inset: 0;
-  z-index: -1;
-  padding: 2px;
-  border-radius: inherit;
-  background: var(--grad-brand);
-  background-size: 250% 100%;
-  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
-  -webkit-mask-composite: xor;
-  mask-composite: exclude;
-  opacity: 0.55;
-  animation: gradientPan 3s linear infinite paused;
-  transition: opacity 400ms ease;
-}
-
-.btn-colorful::after {
-  content: "";
-  position: absolute;
-  inset: 2px;
-  z-index: -2;
-  border-radius: inherit;
-  background: rgba(89, 168, 255, 0);
-  transition: background-color 400ms ease;
-}
-
-.btn-colorful:hover::before,
-.btn-colorful:focus-visible::before {
-  opacity: 1;
-  animation-play-state: running;
-}
-
-.btn-colorful:hover::after {
-  background: rgba(89, 168, 255, 0.1);
-}
-
+/* Skleněná pilulka: vystouplá, po najetí se zvedne, při kliknutí se vtlačí. */
 .btn-ghost {
   display: inline-flex;
   align-items: center;
   gap: 0.55rem;
   padding: 1.05rem 1.6rem;
   border-radius: 999px;
-  border: 1px solid var(--line-strong);
+  border: 1px solid rgba(255, 255, 255, 0.08);
   color: var(--text-muted);
   font-size: 0.85rem;
   font-weight: 700;
   letter-spacing: 0.12em;
   text-transform: uppercase;
-  transition: color 250ms ease, border-color 250ms ease, background-color 250ms ease;
+  background: var(--glass-sheen), rgba(10, 20, 44, 0.55);
+  box-shadow: var(--glass-edges), var(--depth-sm);
+  -webkit-backdrop-filter: blur(10px) saturate(1.3);
+  backdrop-filter: blur(10px) saturate(1.3);
+  transition: color 250ms ease, transform 350ms var(--ease-spring), box-shadow 300ms ease;
 }
 
 .btn-ghost svg {
@@ -594,8 +701,18 @@ section[id] {
 
 .btn-ghost:hover {
   color: #ffffff;
-  border-color: rgba(89, 168, 255, 0.5);
-  background: rgba(89, 168, 255, 0.08);
+  transform: translateY(-2px);
+  box-shadow:
+    var(--glass-edges),
+    0 0 0 1px rgba(89, 168, 255, 0.35),
+    0 16px 30px -12px rgba(0, 0, 0, 0.75),
+    0 0 28px -8px rgba(89, 168, 255, 0.45);
+}
+
+.btn-ghost:active {
+  transform: translateY(1px);
+  box-shadow: var(--pressed);
+  transition-duration: 120ms;
 }
 
 /* ══ REVEAL ═════════════════════════════ */
@@ -611,17 +728,19 @@ section[id] {
 .reveal > :nth-child(5) { transition-delay: 320ms; }
 .reveal > :nth-child(6) { transition-delay: 400ms; }
 
-.reveal-self {
-  opacity: 0;
-  transform: translateY(1.75rem);
-  transition: opacity 700ms ease, transform 800ms var(--ease-out);
-  transition-delay: var(--delay, 0ms);
-}
-
-.reveal.is-visible > *,
-.reveal-self.is-visible {
+.reveal.is-visible > * {
   opacity: 1;
   transform: none;
+}
+
+/* Karty se při odhalení „zvednou“ ze sklopené polohy jako desky na pantu. */
+.reveal-self {
+  opacity: 0;
+  transform-origin: 50% 100%;
+}
+
+.reveal-self.is-visible {
+  animation: rise3d 950ms var(--ease-out) var(--delay, 0ms) both;
 }
 
 /* ══ NAV ════════════════════════════════ */
@@ -641,7 +760,9 @@ section[id] {
   transform: none;
 }
 
+/* Silná skleněná pilulka: lesk nahoře, tmavší spodní hrana, světelný okraj a hluboký stín pod ní. */
 .site-nav__inner {
+  --nav-tint: rgba(7, 14, 32, 0.5);
   position: relative;
   display: flex;
   align-items: center;
@@ -651,19 +772,42 @@ section[id] {
   margin: 0 auto;
   padding: 0 0.5rem 0 0.9rem;
   border-radius: 999px;
-  border: 1px solid rgba(255, 255, 255, 0.11);
-  background: rgba(6, 13, 30, 0.55);
-  box-shadow: 0 14px 44px rgba(0, 0, 0, 0.45), inset 0 1px rgba(255, 255, 255, 0.07);
-  backdrop-filter: blur(16px) saturate(1.25);
-  -webkit-backdrop-filter: blur(16px) saturate(1.25);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  background:
+    var(--noise),
+    linear-gradient(180deg, rgba(255, 255, 255, 0.09), rgba(255, 255, 255, 0.015) 50%, rgba(255, 255, 255, 0.04)),
+    var(--nav-tint);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.24),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.4),
+    inset 0 -8px 16px -10px rgba(124, 180, 255, 0.18),
+    0 2px 0 rgba(0, 0, 0, 0.25),
+    0 20px 44px -12px rgba(0, 0, 0, 0.65),
+    0 6px 14px -4px rgba(0, 0, 0, 0.35);
+  backdrop-filter: blur(18px) saturate(1.5);
+  -webkit-backdrop-filter: blur(18px) saturate(1.5);
   pointer-events: auto;
   transition: background-color 300ms ease, border-color 300ms ease;
 }
 
+.site-nav__inner::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  padding: 1px;
+  pointer-events: none;
+  background: var(--rim);
+  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+  mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  mask-composite: exclude;
+  opacity: 0.8;
+}
+
 .site-nav.is-scrolled .site-nav__inner,
 .site-nav.is-menu-open .site-nav__inner {
-  border-color: rgba(255, 255, 255, 0.14);
-  background: rgba(6, 13, 30, 0.8);
+  --nav-tint: rgba(6, 13, 30, 0.78);
 }
 
 .brand {
@@ -688,6 +832,8 @@ section[id] {
   width: 30px;
   height: 30px;
   flex-shrink: 0;
+  border-radius: 9px;
+  box-shadow: 0 2px 0 #040a1c, 0 6px 12px -4px rgba(0, 0, 0, 0.75);
 }
 
 .brand__frame {
@@ -744,6 +890,8 @@ section[id] {
   margin-left: 0.75rem;
 }
 
+/* Při najetí se odkaz do lišty propadne – vtlačí se jako aktivní sekce a text sjede s povrchem o kousek dolů.
+   Kliknutí ho zamáčkne ještě hlouběji. */
 .nav-link {
   position: relative;
   display: inline-flex;
@@ -752,13 +900,33 @@ section[id] {
   color: var(--text-muted);
   font-size: 0.9rem;
   font-weight: 600;
-  transition: color 300ms ease, background-color 300ms ease;
+  transition: color 300ms ease, background-color 250ms ease, box-shadow 250ms var(--ease-out);
 }
 
 .nav-link:hover,
 .nav-link.is-active {
   color: var(--text);
-  background: rgba(255, 255, 255, 0.06);
+  background-color: rgba(0, 4, 16, 0.32);
+  box-shadow: var(--pressed);
+}
+
+.nav-link:active {
+  background-color: rgba(0, 4, 16, 0.42);
+  box-shadow: inset 4px 4px 9px var(--soft-lo), inset -1px -1px 4px var(--soft-hi);
+  transition-duration: 100ms;
+}
+
+.nav-link .letter-swap {
+  transition: translate 250ms var(--ease-out);
+}
+
+.nav-link:hover .letter-swap,
+.nav-link.is-active .letter-swap {
+  translate: 0 1px;
+}
+
+.nav-link:active .letter-swap {
+  translate: 0 1.5px;
 }
 
 .nav-link.is-active::after {
@@ -804,6 +972,10 @@ section[id] {
   box-shadow: 0 8px 32px rgba(61, 109, 255, 0.5), inset 0 1px rgba(255, 255, 255, 0.3);
 }
 
+.nav-cta.metal-btn:hover {
+  box-shadow: 0 2px 0 rgba(4, 7, 16, 0.95), 0 3px 0 rgba(0, 0, 0, 0.4), 0 14px 28px -8px rgba(0, 0, 0, 0.8), 0 0 30px -8px rgba(150, 190, 255, 0.5);
+}
+
 .nav-cta--lg {
   height: 50px;
   padding: 0 2rem;
@@ -816,8 +988,14 @@ section[id] {
   height: 40px;
   place-items: center;
   border-radius: 999px;
-  border: 1px solid var(--line-strong);
-  background: rgba(255, 255, 255, 0.05);
+  background: linear-gradient(145deg, rgba(255, 255, 255, 0.09), rgba(255, 255, 255, 0.01));
+  box-shadow: var(--raised);
+  transition: box-shadow 200ms ease;
+}
+
+.nav-toggle:active,
+.is-menu-open .nav-toggle {
+  box-shadow: var(--pressed);
 }
 
 .nav-toggle svg {
@@ -825,14 +1003,15 @@ section[id] {
   height: 20px;
 }
 
+/* Přepínač výkonu: vtlačená drážka a v ní lesklý modrý jezdec jako kapka želé. */
 .perf-toggle {
   display: inline-flex;
   align-items: center;
   gap: 0.35rem;
-  padding: 3px 3px 3px 0.6rem;
+  padding: 4px 4px 4px 0.65rem;
   border-radius: 999px;
-  border: 1px solid var(--line);
-  background: rgba(255, 255, 255, 0.03);
+  background: rgba(0, 4, 16, 0.34);
+  box-shadow: var(--pressed), 0 1px 0 rgba(255, 255, 255, 0.05);
 }
 
 .perf-toggle__icon {
@@ -858,10 +1037,16 @@ section[id] {
   left: 0;
   width: calc(100% / 3);
   border-radius: 999px;
-  background: rgba(89, 168, 255, 0.2);
-  box-shadow: inset 0 0 0 1px rgba(89, 168, 255, 0.5);
+  background:
+    radial-gradient(90% 70% at 50% 8%, rgba(255, 255, 255, 0.55), rgba(255, 255, 255, 0) 60%),
+    linear-gradient(180deg, #7ab4ff, #3d6dff 70%, #3159e0);
+  box-shadow:
+    inset 0 -2px 4px rgba(10, 30, 110, 0.55),
+    inset 0 0 0 1px rgba(255, 255, 255, 0.12),
+    0 3px 8px -2px rgba(30, 80, 255, 0.75),
+    0 1px 2px rgba(0, 0, 0, 0.5);
   transform: translateX(calc(var(--idx, 0) * 100%));
-  transition: transform 350ms var(--ease-out);
+  transition: transform 450ms var(--ease-spring);
 }
 
 .perf-toggle button {
@@ -885,6 +1070,7 @@ section[id] {
 
 .perf-toggle button[aria-pressed="true"] {
   color: #ffffff;
+  text-shadow: 0 1px 2px rgba(10, 30, 110, 0.7);
 }
 
 .mobile-menu {
@@ -897,9 +1083,12 @@ section[id] {
   gap: 2rem;
   padding: calc(var(--nav-h) + 4rem) 1.5rem 2rem;
   overflow-y: auto;
-  background: rgba(4, 9, 22, 0.95);
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
+  background:
+    var(--noise),
+    radial-gradient(70% 45% at 50% 0%, rgba(77, 143, 255, 0.16), transparent 70%),
+    rgba(4, 9, 22, 0.88);
+  backdrop-filter: blur(22px) saturate(1.4);
+  -webkit-backdrop-filter: blur(22px) saturate(1.4);
   animation: fadeIn 300ms ease both;
 }
 
@@ -943,6 +1132,7 @@ section[id] {
 
 .hero__inner {
   position: relative;
+  z-index: 1;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -968,12 +1158,22 @@ section[id] {
   text-shadow: 0 0 18px rgba(124, 236, 255, 0.35);
 }
 
+/* Nadpis se štítky je 3D scéna: natáčí se za kurzorem (--px/--py z lib/pointer3d.js, jinak stojí rovně). */
 .hero__title-wrap {
   position: relative;
+  perspective: 1000px;
 }
 
+.hero__stage {
+  position: relative;
+  transform-style: preserve-3d;
+  transform: rotateX(calc(var(--py, 0) * -14deg)) rotateY(calc(var(--px, 0) * 20deg));
+}
+
+/* AFROX z voxelů: chromové čelo s horizontem, který se při natočení přelévá, a hloubka, která uhýbá od kurzoru –
+   nápis se otáčí čelem za ním, takže je vidět opačný bok. */
 .hero__name {
-  padding: 0 0.04em 0.05em;
+  padding: 0 0.04em 0.12em;
   font-family: var(--font-display);
   font-weight: 900;
   font-size: var(--text-display);
@@ -981,48 +1181,97 @@ section[id] {
   letter-spacing: 0.02em;
   text-transform: uppercase;
   color: #ffffff;
-  background: linear-gradient(180deg, #ffffff 0%, #d9ecff 40%, #82bcff 72%, #4f7fff 100%);
-  -webkit-background-clip: text;
-  background-clip: text;
-  -webkit-text-fill-color: transparent;
-  filter: drop-shadow(0 0 28px rgba(89, 168, 255, 0.45)) drop-shadow(0 10px 30px rgba(0, 0, 0, 0.55));
+  filter: drop-shadow(0 0 32px rgba(89, 168, 255, 0.32));
+}
+
+.hero__name .voxel {
+  --vx-face: linear-gradient(180deg, #ffffff 0%, #f4f9ff 22%, #d2e6ff 40%, #78abff 49%, #4374ea 56%, #8bb9ff 72%, #e6f2ff 100%);
+  --vx-s1: #3f6cd2;
+  --vx-s2: #2b52a8;
+  --vx-s3: #1b3a80;
+  --vx-s4: #0f2559;
+  --vx-x: calc(0.0016em - var(--px, 0) * 0.011em);
+  --vx-y: calc(0.0066em - var(--py, 0) * 0.009em);
+}
+
+.hero__name .voxel__face {
+  background-size: 100% 210%;
+  background-position: 0 calc(50% + var(--py, 0) * 70%);
 }
 
 .hero__tags {
   position: absolute;
   inset: 0;
   pointer-events: none;
+  transform-style: preserve-3d;
 }
 
+/* Štítky visí před nadpisem v různé hloubce (--z), takže se při natočení scény posouvají vůči písmu. */
 .hero-tag {
   position: absolute;
   display: inline-flex;
   opacity: 0;
+  translate: 0 0 var(--z, 80px);
   transform: rotate(var(--rot, 0deg)) scale(0);
 }
 
-.hero-tag > span {
+/* Štítky jsou z čirého skla jako tlačítko Spustit hru, ale bez .liquid a SVG lomu: s nimi by plovoucí animace
+   neběžela na GPU a v každém snímku by přepočítávala styly. */
+.hero-tag > .hero-tag__glass {
+  position: relative;
+  isolation: isolate;
   display: inline-flex;
-  padding: 0.4rem 0.95rem;
+  padding: 0.45rem 1rem;
   border-radius: 999px;
-  border: 1px solid rgba(124, 236, 255, 0.5);
-  background: rgba(6, 16, 38, 0.72);
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.35), 0 0 18px rgba(89, 168, 255, 0.18);
-  color: #e3f4ff;
-  font-size: 0.82rem;
-  font-weight: 700;
+  background: rgba(8, 18, 45, 0.3);
+  -webkit-backdrop-filter: blur(3px) saturate(160%) brightness(1.15);
+  backdrop-filter: blur(3px) saturate(160%) brightness(1.15);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.55),
+    inset 0 -1px 0 rgba(255, 255, 255, 0.18),
+    inset 0 0 14px rgba(255, 255, 255, 0.07),
+    inset 0 -10px 16px -12px rgba(150, 220, 255, 0.6),
+    0 10px 26px -14px rgba(0, 0, 0, 0.5);
+  color: #f2f9ff;
+  font-size: 0.84rem;
+  font-weight: 800;
   letter-spacing: 0.06em;
   white-space: nowrap;
-  backdrop-filter: blur(8px);
-  -webkit-backdrop-filter: blur(8px);
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.75);
   animation: tagFloat 6s ease-in-out infinite;
   animation-delay: var(--float, 0s);
 }
 
-.hero-tag--1 { top: 6%; left: -11%; --rot: -8deg; --pop: 900ms; --float: -1s; }
-.hero-tag--2 { top: 30%; right: -19%; --rot: 6deg; --pop: 1020ms; --float: -3s; }
-.hero-tag--3 { bottom: -7%; right: -6%; --rot: -5deg; --pop: 1140ms; --float: -2s; }
-.hero-tag--4 { bottom: -6%; left: -3%; --rot: 7deg; --pop: 1260ms; --float: -4s; }
+/* Lesk nahoře a okraj, který chytá světlo vlevo nahoře a vpravo dole (jako .liquid). */
+.hero-tag > .hero-tag__glass::before,
+.hero-tag > .hero-tag__glass::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  pointer-events: none;
+}
+
+.hero-tag > .hero-tag__glass::before {
+  z-index: -1;
+  background:
+    radial-gradient(60% 110% at 28% 0%, rgba(255, 255, 255, 0.2), transparent 55%),
+    linear-gradient(180deg, rgba(255, 255, 255, 0.1), transparent 40%);
+}
+
+.hero-tag > .hero-tag__glass::after {
+  padding: 1px;
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.9), rgba(255, 255, 255, 0.14) 36%, rgba(255, 255, 255, 0.04) 64%, rgba(170, 220, 255, 0.6));
+  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+  mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  mask-composite: exclude;
+}
+
+.hero-tag--1 { top: 6%; left: -11%; --rot: -8deg; --z: 110px; --pop: 900ms; --float: -1s; }
+.hero-tag--2 { top: 30%; right: -19%; --rot: 6deg; --z: 70px; --pop: 1020ms; --float: -3s; }
+.hero-tag--3 { bottom: -7%; right: -6%; --rot: -5deg; --z: 140px; --pop: 1140ms; --float: -2s; }
+.hero-tag--4 { bottom: -6%; left: -3%; --rot: 7deg; --z: 95px; --pop: 1260ms; --float: -4s; }
 
 .is-ready .hero-tag {
   animation: tagPop 800ms var(--ease-spring) forwards;
@@ -1049,10 +1298,15 @@ section[id] {
   gap: 0.6rem;
   max-width: 100%;
   margin-top: 1.4rem;
-  padding: 0.6rem 1rem;
-  border-radius: 12px;
-  border: 1px solid var(--line-strong);
-  background: rgba(4, 10, 24, 0.62);
+  padding: 0.65rem 1.05rem;
+  border-radius: 14px;
+  /* Vtlačený „displej“ terminálu: stín uvnitř nahoře, světlá hrana dole. */
+  background: linear-gradient(180deg, rgba(1, 4, 14, 0.78), rgba(5, 12, 30, 0.66));
+  box-shadow:
+    inset 0 3px 8px rgba(0, 0, 0, 0.65),
+    inset 0 -1px 0 rgba(124, 180, 255, 0.1),
+    0 1px 0 rgba(255, 255, 255, 0.08),
+    0 0 0 1px rgba(0, 0, 0, 0.35);
   color: var(--text-muted);
   font-size: 0.92rem;
   text-align: left;
@@ -1084,6 +1338,36 @@ section[id] {
   margin-top: 2.1rem;
 }
 
+/* Skleněná kostka s tečkovanými stěnami (components/ui/Cube3d.jsx), velikost z --size. */
+.cube3d {
+  --half: calc(var(--size) / 2);
+  position: absolute;
+  inset: 0;
+  transform-style: preserve-3d;
+  transform: rotateX(-22deg) rotateY(-32deg);
+  animation: cubeSpin 22s linear infinite;
+}
+
+.cube3d__face {
+  position: absolute;
+  inset: 0;
+  border-radius: 16%;
+  border: 1px solid rgba(170, 225, 255, 0.55);
+  background:
+    radial-gradient(circle, rgba(124, 236, 255, 0.6) 0 1.3px, transparent 1.9px) 50% 50% / 20% 20%,
+    linear-gradient(135deg, rgba(124, 236, 255, 0.22), rgba(77, 143, 255, 0.06) 55%, rgba(155, 123, 255, 0.22));
+  box-shadow:
+    inset 0 0 calc(var(--size) * 0.22) rgba(124, 236, 255, 0.25),
+    0 0 calc(var(--size) * 0.18) rgba(89, 168, 255, 0.18);
+}
+
+.cube3d__face--front { transform: translateZ(var(--half)); }
+.cube3d__face--back { transform: rotateY(180deg) translateZ(var(--half)); }
+.cube3d__face--right { transform: rotateY(90deg) translateZ(var(--half)); }
+.cube3d__face--left { transform: rotateY(-90deg) translateZ(var(--half)); }
+.cube3d__face--top { transform: rotateX(90deg) translateZ(var(--half)); }
+.cube3d__face--bottom { transform: rotateX(-90deg) translateZ(var(--half)); }
+
 /* ══ SHOWCASE ═══════════════════════════ */
 .showcase {
   position: relative;
@@ -1096,99 +1380,460 @@ section[id] {
 .showcase__persp {
   max-width: 1080px;
   margin: 0 auto;
-  perspective: 1200px;
 }
 
-.showcase__card {
-  --p: 0;
+/* Scéna notebooku. cqw = 1 % její šířky, takže rámeček, tloušťka i klávesy rostou s notebookem. */
+.showcase__stage {
   position: relative;
-  padding: 0.55rem;
-  border-radius: 24px;
-  border: 1px solid rgba(160, 205, 255, 0.18);
-  background: linear-gradient(180deg, #14244a, #0a142b);
-  box-shadow:
-    0 10px 22px rgba(0, 0, 0, 0.3),
-    0 36px 60px rgba(0, 0, 0, 0.28),
-    0 84px 80px rgba(0, 0, 0, 0.2),
-    0 0 120px rgba(89, 168, 255, 0.14);
-  transform-origin: 50% 0;
-  transform: rotateX(calc((1 - var(--p)) * 26deg)) scale(calc(0.9 + var(--p) * 0.1));
+  container-type: inline-size;
+  perspective: 2400px;
+  perspective-origin: 50% 45%;
+}
+
+/* 3D notebook. Při scrollu (--p 0→1) se víko otevře z téměř zavřené polohy a pohled sjede níž; za kurzorem se
+   celý notebook lehce natočí (--rx/--ry z obalu). --lid je úhel víka vůči spodku, --view sklon celého notebooku
+   k divákovi, osou obou je pant (spodní hrana víka). Přivřené víko je v průmětu nižší, tak ho --drop posune
+   nahoru, aby horní hrana zůstala na místě (jako dřív u monitoru) a notebook se při otevírání rozkládal dolů. */
+.laptop {
+  --p: 0;
+  --lid: calc(-90deg + var(--p) * 96deg);
+  --view: calc(-30deg + var(--p) * 26deg);
+  --zoom: calc(0.86 + var(--p) * 0.14);
+  --drop: clamp(0, 1 - var(--zoom) * cos(var(--view) + var(--lid)), 0.9);
+  position: relative;
+  margin-bottom: 17cqw;
+  pointer-events: none;
+  transform-style: preserve-3d;
+  transform-origin: 50% 100%;
+  transform:
+    translateY(calc(var(--drop) * -100%))
+    rotateX(calc(var(--view) + var(--rx, 0deg)))
+    rotateY(var(--ry, 0deg))
+    scale(var(--zoom));
   will-change: transform;
 }
 
-.showcase__bar {
-  display: flex;
-  align-items: center;
-  gap: 0.75rem;
-  padding: 0.2rem 0.4rem 0.6rem;
-  color: var(--text-dim);
-  font-size: 0.78rem;
+/* Při hraní displej míří rovně na diváka (sklon víka a pohledu se vyruší) a notebook se nenaklání. */
+.laptop.is-playing {
+  --lid: 6deg;
+  --view: -6deg;
+  --zoom: 1;
+  --rx: 0deg;
+  --ry: 0deg;
+  --tx: 0;
 }
 
-.showcase__dots {
-  display: inline-flex;
-  gap: 6px;
+.laptop.is-playing,
+.laptop.is-playing .laptop__lid {
+  transition: transform 900ms var(--ease-out);
 }
 
-.showcase__dots i {
-  width: 10px;
-  height: 10px;
+.laptop__lid {
+  --lid-depth: 0.7cqw;
+  position: relative;
+  transform-style: preserve-3d;
+  transform-origin: 50% 100%;
+  transform: rotateX(var(--lid));
+}
+
+/* Víko zepředu: lesklý černý rámeček s kamerou, spodní lišta s nápisem a kolem tenká hliníková hrana.
+   Klikat jde jen sem – vlastní roviny notebooku a víka jsou v 3D scéně neviditelné, ale při zakloněném víku by
+   ležely před displejem a chytaly kliky (proto pointer-events: none na .laptop). */
+.laptop__face {
+  position: relative;
+  pointer-events: auto;
+  padding: 1.4cqw 1.4cqw 2.6cqw;
+  border-radius: 2.2cqw 2.2cqw 1cqw 1cqw;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.06), rgba(255, 255, 255, 0) 30%),
+    #070b16;
+  box-shadow:
+    inset 0 0 0 1px rgba(255, 255, 255, 0.07),
+    0 0 0 0.22cqw #24365f,
+    0 0 0 calc(0.22cqw + 1px) rgba(0, 0, 0, 0.6),
+    0 0 90px rgba(89, 168, 255, 0.14);
+  backface-visibility: hidden;
+}
+
+.laptop__camera {
+  position: absolute;
+  top: 0.45cqw;
+  left: 50%;
+  width: 0.55cqw;
+  height: 0.55cqw;
   border-radius: 50%;
-  background: #7cecff;
-  opacity: 0.75;
+  background: radial-gradient(circle at 35% 35%, #4a6cb0 0, #142040 45%, #05080f 70%);
+  box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.05);
+  transform: translateX(-50%);
 }
 
-.showcase__dots i:nth-child(2) {
-  background: #59a8ff;
+.laptop__label {
+  position: absolute;
+  left: 50%;
+  bottom: 0.7cqw;
+  color: rgba(163, 181, 209, 0.5);
+  font-family: var(--font-display);
+  font-size: 1.1cqw;
+  font-weight: 800;
+  line-height: 1;
+  letter-spacing: 0.3em;
+  text-transform: uppercase;
+  transform: translateX(-50%);
 }
 
-.showcase__dots i:nth-child(3) {
-  background: #9b7bff;
-}
-
-.showcase__path {
-  flex: 1;
-  min-width: 0;
+/* Displej je plocha Windows 11: tapeta, maximalizované okno se hrou a dole hlavní panel. */
+.desktop {
+  position: relative;
+  display: flex;
+  flex-direction: column;
   overflow: hidden;
+  border-radius: 0.5cqw;
+  background:
+    radial-gradient(65% 85% at 50% 118%, rgba(89, 168, 255, 0.8), transparent 62%),
+    radial-gradient(42% 70% at 26% 108%, rgba(155, 123, 255, 0.6), transparent 66%),
+    radial-gradient(42% 70% at 74% 108%, rgba(124, 236, 255, 0.5), transparent 66%),
+    linear-gradient(180deg, #091330, #0e2050);
+  color: #e6edff;
+}
+
+/* Ovládání uvnitř displeje ořezává jeho okraj, proto má fokus obrys dovnitř. */
+.desktop :focus-visible {
+  outline-offset: -2px;
+}
+
+/* Zástupce hry na ploše – leží pod oknem, vidět je až po jeho zavření nebo minimalizaci. */
+.desktop__shortcut {
+  position: absolute;
+  top: 1.4cqw;
+  left: 1.4cqw;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.4cqw;
+  width: clamp(64px, 8cqw, 96px);
+  padding: 0.5cqw;
+  border-radius: 6px;
+  color: #ffffff;
+  font-size: clamp(0.58rem, 0.95cqw, 0.75rem);
   font-weight: 600;
-  letter-spacing: 0.04em;
+  line-height: 1.2;
   text-align: center;
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.8);
+}
+
+.desktop__shortcut:hover {
+  background: rgba(255, 255, 255, 0.12);
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.18);
+}
+
+.desktop__shortcut-icon {
+  width: clamp(32px, 4.4cqw, 52px);
+  height: auto;
+  aspect-ratio: 1;
+  border-radius: 18%;
+  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.5));
+}
+
+/* Okno vyplní plochu nad hlavním panelem. Minimalizace ho stáhne do ikony v panelu, obnovení vrátí zpátky. */
+.win {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  background: #0b1530;
+  box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.08);
+  transform-origin: 50% 100%;
+  transition: transform 340ms var(--ease-out), opacity 240ms ease, visibility 0s;
+}
+
+.desktop.is-minimized .win {
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(32%) scale(0.08);
+  transition: transform 300ms cubic-bezier(0.55, 0, 0.75, 0.2), opacity 260ms ease 40ms, visibility 0s linear 300ms;
+}
+
+/* Titulek okna jako ve Windows 11: ikona a název vlevo, vpravo minimalizovat, celá obrazovka a zavřít. */
+.win__titlebar {
+  display: flex;
+  flex-shrink: 0;
+  align-items: center;
+  height: clamp(24px, 2.7cqw, 32px);
+  padding-left: clamp(8px, 1cqw, 12px);
+  background: #10193a;
+  color: rgba(230, 237, 255, 0.86);
+  font-size: clamp(0.62rem, 1.05cqw, 0.78rem);
+  font-weight: 600;
+  user-select: none;
+}
+
+.win__title {
+  display: flex;
+  flex: 1;
+  align-items: center;
+  gap: 0.6em;
+  min-width: 0;
+}
+
+.win__name {
+  overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
 
-.showcase__open {
-  display: inline-flex;
+.win__icon {
   flex-shrink: 0;
-  align-items: center;
-  gap: 0.3rem;
-  padding: 0.3rem 0.75rem;
-  border-radius: 999px;
-  border: 1px solid var(--line-strong);
-  background: transparent;
-  color: var(--text-muted);
-  font: inherit;
-  font-weight: 700;
-  transition: color 250ms ease, border-color 250ms ease, background-color 250ms ease;
+  width: 1.3em;
+  height: 1.3em;
+  border-radius: 3px;
 }
 
-.showcase__open svg {
-  width: 0.9rem;
-  height: 0.9rem;
+.win__controls {
+  display: flex;
+  align-self: stretch;
 }
 
-.showcase__open:hover {
+.win__control {
+  display: grid;
+  place-items: center;
+  width: clamp(32px, 4.4cqw, 46px);
+  color: rgba(230, 237, 255, 0.86);
+  transition: background-color 120ms ease, color 120ms ease;
+}
+
+.win__control svg {
+  width: clamp(10px, 1.05cqw, 12px);
+  height: clamp(10px, 1.05cqw, 12px);
+  stroke-width: 1.4;
+}
+
+.win__control:hover {
   color: #ffffff;
-  border-color: rgba(89, 168, 255, 0.5);
-  background: rgba(89, 168, 255, 0.12);
+  background: rgba(255, 255, 255, 0.09);
 }
 
+.win__control:active {
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.win__control--close:hover {
+  background: #c42b1c;
+}
+
+.win__control--close:active {
+  background: #9b2217;
+}
+
+/* Hlavní panel: uprostřed Start, hra a GitHub (odkaz na repo projektu), vpravo ikonky a skutečný čas. */
+.taskbar {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  flex-shrink: 0;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: center;
+  height: clamp(30px, 3.6cqw, 42px);
+  padding: 0 clamp(6px, 0.8cqw, 10px);
+  background: rgba(16, 24, 50, 0.9);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.07);
+}
+
+.taskbar__apps {
+  display: flex;
+  grid-column: 2;
+  align-items: center;
+  gap: clamp(2px, 0.35cqw, 4px);
+}
+
+.taskbar__item {
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: clamp(26px, 3.1cqw, 36px);
+  height: clamp(24px, 2.9cqw, 34px);
+  border-radius: 5px;
+  color: #e6edff;
+  transition: background-color 150ms ease;
+}
+
+.taskbar__item:is(a, button):hover {
+  background: rgba(255, 255, 255, 0.09);
+}
+
+.taskbar__item:is(a, button):active {
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.taskbar__item > :is(svg, img) {
+  width: 58%;
+  height: 58%;
+}
+
+.taskbar__item img {
+  border-radius: 3px;
+}
+
+.taskbar__start > svg {
+  width: 68%;
+  height: 68%;
+}
+
+/* Otevřená aplikace má pod ikonou proužek; když se hraje, je delší a modrý. */
+.taskbar__item.is-open::after {
+  content: "";
+  position: absolute;
+  bottom: 1px;
+  left: 50%;
+  width: 6px;
+  height: 3px;
+  border-radius: 2px;
+  background: rgba(205, 215, 235, 0.75);
+  transform: translateX(-50%);
+  transition: width 200ms var(--ease-out), background-color 200ms ease;
+}
+
+.taskbar__item.is-open.is-active::after {
+  width: 14px;
+  background: #7cecff;
+}
+
+.taskbar__tray {
+  display: flex;
+  grid-column: 3;
+  justify-self: end;
+  align-items: center;
+  gap: clamp(4px, 0.6cqw, 8px);
+  color: rgba(230, 237, 255, 0.85);
+}
+
+.taskbar__tray > svg {
+  width: clamp(11px, 1.2cqw, 14px);
+  height: clamp(11px, 1.2cqw, 14px);
+}
+
+.taskbar__clock {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  margin-left: clamp(2px, 0.4cqw, 6px);
+  font-size: clamp(0.5rem, 0.85cqw, 0.68rem);
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  line-height: 1.25;
+}
+
+/* Zadní kryt víka se svítícím logem – vidět je, dokud je notebook zavřený. Leží o tloušťku víka za displejem,
+   takže zavřený kryt neleží ve stejné rovině jako spodní díl a nebliká. */
+.laptop__cover {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  border-radius: 2.2cqw 2.2cqw 1cqw 1cqw;
+  background:
+    radial-gradient(55% 45% at 50% 45%, rgba(89, 168, 255, 0.18), transparent 70%),
+    linear-gradient(160deg, #22355f, #142347 55%, #0d1834);
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.08), inset 0 2px 0 rgba(255, 255, 255, 0.12);
+  transform: translateZ(calc(var(--lid-depth) * -1)) rotateX(180deg);
+  backface-visibility: hidden;
+}
+
+/* Horní hrana víka (tloušťka mezi displejem a krytem) – u zavřeného notebooku je to přední hrana víka. */
+.laptop__lid::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 1.2cqw;
+  right: 1.2cqw;
+  height: var(--lid-depth);
+  border-radius: 0.4cqw;
+  background: linear-gradient(180deg, #3a5288, #1c2d58);
+  transform-origin: 50% 0;
+  transform: rotateX(-90deg);
+}
+
+.laptop__logo {
+  width: 11cqw;
+  height: 11cqw;
+  filter: drop-shadow(0 0 1.6cqw rgba(89, 168, 255, 0.75));
+}
+
+/* Spodní díl leží na „stole“: od pantu sklopený o 90° k divákovi, stejně hluboký jako víko. Vzadu pant, pak
+   klávesnice s jemným bílým podsvícením (prosvítá mezerami mezi klávesami) a touchpad, vpředu hrana s vybráním
+   na prst. Stín ve stejné rovině padá na stůl. */
+.laptop__base {
+  position: absolute;
+  top: 100%;
+  left: -1.2cqw;
+  right: -1.2cqw;
+  height: 100%;
+  border-radius: 0.6cqw 0.6cqw 2cqw 2cqw;
+  background:
+    var(--noise),
+    linear-gradient(180deg, #0c1530 0%, #1a2b56 7%, #1d305e 40%, #162650 100%);
+  box-shadow:
+    inset 0 0 0 1px rgba(255, 255, 255, 0.06),
+    0 0 6cqw 1cqw rgba(0, 0, 0, 0.55);
+  transform-style: preserve-3d;
+  transform-origin: 50% 0;
+  transform: rotateX(90deg);
+}
+
+.laptop__base::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 9%;
+  right: 9%;
+  height: 3.5%;
+  border-radius: 0 0 0.8cqw 0.8cqw;
+  background: linear-gradient(180deg, #05080f, #101b38);
+}
+
+.laptop__base::after {
+  content: "";
+  position: absolute;
+  top: 100%;
+  left: 2cqw;
+  right: 2cqw;
+  height: 1.3cqw;
+  border-radius: 0 0 1cqw 1cqw;
+  background:
+    radial-gradient(9% 70% at 50% 0%, rgba(0, 0, 0, 0.65), transparent 100%),
+    linear-gradient(180deg, #2a3e70, #111d3d 70%, #0a1229);
+  transform-origin: 50% 0;
+  transform: rotateX(-90deg);
+}
+
+.laptop__keyboard {
+  position: absolute;
+  top: 7%;
+  left: 7%;
+  right: 7%;
+  height: 40%;
+  border-radius: 0.6cqw;
+  background:
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 10 10' preserveAspectRatio='none'%3E%3Crect x='0.8' y='0.8' width='8.4' height='8.4' rx='1.5' fill='%230b1430'/%3E%3Crect x='0.8' y='0.8' width='8.4' height='3' rx='1.5' fill='%23ffffff' fill-opacity='0.07'/%3E%3C/svg%3E") 0 0 / calc(100% / 15) calc(100% / 6),
+    rgba(214, 228, 255, 0.24);
+  box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.6), 0 0 2cqw rgba(214, 228, 255, 0.1);
+}
+
+.laptop__trackpad {
+  position: absolute;
+  top: 54%;
+  left: 33%;
+  right: 33%;
+  height: 30%;
+  border-radius: 1cqw;
+  background: linear-gradient(180deg, #2b4277, #223768);
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.14), 0 0 0 1px rgba(0, 0, 0, 0.45), 0 0 1.5cqw rgba(124, 180, 255, 0.12);
+}
+
+/* Obsah okna: screenshot nebo hra, se stínem u horní hrany a odleskem skla, který se posouvá s náklonem. */
 .showcase__screen {
   position: relative;
   aspect-ratio: 1800 / 970;
   overflow: hidden;
-  border-radius: 16px;
-  border: 1px solid rgba(255, 255, 255, 0.07);
   background: #0b1630;
 }
 
@@ -1198,12 +1843,27 @@ section[id] {
   object-fit: cover;
 }
 
+.showcase__screen::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+  background: linear-gradient(115deg, rgba(255, 255, 255, 0) 30%, rgba(255, 255, 255, 0.08) 43%, rgba(255, 255, 255, 0) 56%);
+  transform: translateX(calc(var(--tx, 0) * 14%));
+}
+
 .showcase__screen::after {
   content: "";
   position: absolute;
   inset: 0;
   pointer-events: none;
+  border-radius: inherit;
   background: linear-gradient(180deg, transparent 62%, rgba(5, 11, 26, 0.35));
+  box-shadow:
+    inset 0 0 0 1px rgba(255, 255, 255, 0.05),
+    inset 0 16px 30px -20px rgba(0, 0, 0, 0.85),
+    inset 0 -12px 26px -18px rgba(0, 0, 0, 0.75);
 }
 
 /* Tlačítko ▶ přes celý screenshot; po kliknutí ho nahradí iframe se hrou. */
@@ -1254,6 +1914,7 @@ section[id] {
   background: #000000;
 }
 
+.showcase__screen.is-playing::before,
 .showcase__screen.is-playing::after {
   display: none;
 }
@@ -1430,22 +2091,42 @@ section[id] {
   padding: var(--metal-rim);
   gap: 0;
   background: none;
-  box-shadow: 0 14px 30px -14px rgba(0, 0, 0, 0.8), 0 0 0 1px rgba(255, 255, 255, 0.05);
-  transition: transform 450ms var(--ease-spring);
+  /* Tloušťka tlačítka: tmavý spodní lem, pod ním měkký stín a slabá záře kovu. */
+  box-shadow:
+    0 0 0 1px rgba(255, 255, 255, 0.05),
+    0 3px 0 rgba(4, 7, 16, 0.95),
+    0 4px 0 rgba(0, 0, 0, 0.45),
+    0 18px 30px -12px rgba(0, 0, 0, 0.85),
+    0 0 36px -14px var(--metal-glow, rgba(150, 190, 255, 0.55));
+  transition: transform 450ms var(--ease-spring), box-shadow 300ms ease;
 }
 
 .pill-button.metal-pill--violet {
   --metal-panel: #110b22;
+  --metal-glow: rgba(180, 140, 255, 0.55);
 }
 
 .pill-button.metal-pill:hover {
-  transform: translateY(-2px);
+  transform: translateY(-3px);
   background: none;
+  box-shadow:
+    0 0 0 1px rgba(255, 255, 255, 0.06),
+    0 3px 0 rgba(4, 7, 16, 0.95),
+    0 4px 0 rgba(0, 0, 0, 0.45),
+    0 26px 40px -14px rgba(0, 0, 0, 0.9),
+    0 0 44px -10px var(--metal-glow, rgba(150, 190, 255, 0.55));
 }
 
+/* Stisk: tlačítko zajede do lemu. */
 .pill-button.metal-pill:active {
-  transform: translateY(0) scale(0.98);
-  transition-duration: 140ms;
+  transform: translateY(3px);
+  box-shadow:
+    0 0 0 1px rgba(255, 255, 255, 0.05),
+    0 0 0 rgba(4, 7, 16, 0.95),
+    0 1px 0 rgba(0, 0, 0, 0.45),
+    0 8px 14px -8px rgba(0, 0, 0, 0.85),
+    0 0 30px -14px var(--metal-glow, rgba(150, 190, 255, 0.55));
+  transition-duration: 120ms;
 }
 
 .metal-pill__core {
@@ -1499,7 +2180,18 @@ section[id] {
   isolation: isolate;
   padding: 2px;
   background: none;
-  box-shadow: 0 8px 24px -8px rgba(0, 0, 0, 0.7);
+  box-shadow: 0 2px 0 rgba(4, 7, 16, 0.95), 0 3px 0 rgba(0, 0, 0, 0.4), 0 10px 24px -8px rgba(0, 0, 0, 0.75);
+}
+
+.nav-cta.metal-btn:active {
+  transform: translateY(2px);
+  box-shadow: 0 0 0 rgba(4, 7, 16, 0.95), 0 1px 0 rgba(0, 0, 0, 0.4), 0 6px 12px -6px rgba(0, 0, 0, 0.75);
+  transition-duration: 120ms;
+}
+
+.nav-cta--lg.metal-btn {
+  padding: 3px;
+  box-shadow: 0 3px 0 rgba(4, 7, 16, 0.95), 0 4px 0 rgba(0, 0, 0, 0.45), 0 18px 32px -12px rgba(0, 0, 0, 0.85), 0 0 36px -14px rgba(150, 190, 255, 0.5);
 }
 
 .metal-btn__core {
@@ -1651,14 +2343,6 @@ section[id] {
   color: #7487ab;
 }
 
-.section__title .glow {
-  background: linear-gradient(90deg, var(--cyan), var(--neon) 45%, var(--violet));
-  -webkit-background-clip: text;
-  background-clip: text;
-  -webkit-text-fill-color: transparent;
-  filter: drop-shadow(0 0 22px rgba(89, 168, 255, 0.45));
-}
-
 .section__lead {
   max-width: 30rem;
   color: var(--text-muted);
@@ -1730,6 +2414,17 @@ section[id] {
   height: 100%;
 }
 
+/* Na počítači se karta naklání za kurzorem (data-tilt na buňce, lib/pointer3d.js) a při najetí se zvedne. */
+.fx-3d .project-glow {
+  transform: perspective(1000px) rotateX(var(--rx, 0deg)) rotateY(var(--ry, 0deg));
+  transition: scale 500ms var(--ease-spring);
+}
+
+.fx-3d .project-cell.is-tilting .project-glow {
+  scale: 1.025;
+}
+
+/* Skleněná deska: zrno, lesk zleva shora, světlý okraj v barvě projektu a stín, který uhýbá proti náklonu. */
 .project-card {
   --accent-a: #59a8ff;
   --accent-b: #7cecff;
@@ -1740,38 +2435,64 @@ section[id] {
   height: 100%;
   overflow: hidden;
   border-radius: 20px;
-  border: 1px solid var(--line);
-  background: linear-gradient(200deg, rgba(15, 29, 60, 0.92), rgba(7, 14, 31, 0.94) 62%);
-  box-shadow: 0 18px 40px rgba(0, 0, 0, 0.25);
-  transition: transform 500ms var(--ease-out), border-color 350ms ease, box-shadow 350ms ease;
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  background:
+    var(--noise),
+    var(--glass-sheen),
+    linear-gradient(200deg, rgba(15, 29, 60, 0.92), rgba(7, 14, 31, 0.94) 62%);
+  box-shadow:
+    var(--glass-edges),
+    0 2px 0 rgba(12, 24, 54, 0.9),
+    0 3px 0 rgba(0, 0, 0, 0.45),
+    calc(var(--tx, 0) * -16px) calc(18px + var(--ty, 0) * -12px) 40px -16px rgba(0, 0, 0, 0.75),
+    0 4px 10px -2px rgba(0, 0, 0, 0.35);
+  transition: transform 500ms var(--ease-out);
 }
 
 .fx-full .project-card {
-  background: linear-gradient(200deg, rgba(15, 29, 60, 0.74), rgba(7, 14, 31, 0.82) 62%);
-  backdrop-filter: blur(8px);
-  -webkit-backdrop-filter: blur(8px);
+  background:
+    var(--noise),
+    var(--glass-sheen),
+    linear-gradient(200deg, rgba(15, 29, 60, 0.7), rgba(7, 14, 31, 0.8) 62%);
+  backdrop-filter: blur(10px) saturate(1.3);
+  -webkit-backdrop-filter: blur(10px) saturate(1.3);
 }
 
 .project-card:hover,
 .project-card:has(:focus-visible) {
   transform: translateY(-4px);
-  border-color: color-mix(in srgb, var(--accent-a) 38%, transparent);
-  box-shadow: 0 24px 50px rgba(0, 0, 0, 0.35), 0 0 40px color-mix(in srgb, var(--accent-a) 12%, transparent);
+}
+
+.fx-3d .project-card:hover,
+.fx-3d .project-card:has(:focus-visible) {
+  transform: none;
 }
 
 .project-card::before {
   content: "";
   position: absolute;
-  top: 0;
-  left: 16%;
-  right: 16%;
+  inset: 0;
   z-index: 3;
-  height: 1px;
-  background: linear-gradient(90deg, transparent, var(--accent-a), transparent);
+  border-radius: inherit;
+  padding: 1px;
+  pointer-events: none;
+  background: linear-gradient(
+    150deg,
+    rgba(255, 255, 255, 0.42),
+    rgba(255, 255, 255, 0.08) 22%,
+    rgba(255, 255, 255, 0) 46%,
+    color-mix(in srgb, var(--accent-a) 22%, transparent) 78%,
+    color-mix(in srgb, var(--accent-b) 60%, transparent)
+  );
+  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+  mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  mask-composite: exclude;
   opacity: 0.5;
   transition: opacity 350ms ease;
 }
 
+/* Odlesk: světlo u kurzoru a slabý pruh přes sklo, který se stáčí s náklonem. */
 .project-card::after {
   content: "";
   position: absolute;
@@ -1779,13 +2500,24 @@ section[id] {
   z-index: 2;
   pointer-events: none;
   opacity: 0;
-  background: radial-gradient(340px 240px at var(--mx, 50%) var(--my, 0%), rgba(255, 255, 255, 0.07), transparent 65%);
+  background:
+    radial-gradient(520px circle at var(--gx, 50%) var(--gy, 0%), rgba(255, 255, 255, 0.12), transparent 42%),
+    linear-gradient(calc(110deg + var(--tx, 0) * 30deg), transparent 34%, rgba(255, 255, 255, 0.05) 48%, transparent 62%);
   transition: opacity 350ms ease;
 }
 
 .project-card:hover::before,
 .project-card:hover::after {
   opacity: 1;
+}
+
+/* Obsah leží „nad“ sklem a obrázek „pod“ ním, takže se při náklonu posouvají proti sobě. */
+.fx-3d .project-card__body {
+  translate: calc(var(--tx, 0) * 4px) calc(var(--ty, 0) * 4px);
+}
+
+.fx-3d .project-card__media img {
+  translate: calc(var(--tx, 0) * -6px) calc(var(--ty, 0) * -6px);
 }
 
 /* Barevné „bloby“, které se rozsvítí při hoveru (inspirace Lepshee). */
@@ -1811,8 +2543,8 @@ section[id] {
   margin: 0.6rem 0.6rem 0;
   overflow: hidden;
   border-radius: 14px;
-  border: 1px solid rgba(255, 255, 255, 0.07);
   background: #081226;
+  box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.5), 0 1px 0 1px rgba(255, 255, 255, 0.06);
 }
 
 .project-card__media img {
@@ -1829,12 +2561,15 @@ section[id] {
   filter: saturate(1.05);
 }
 
+/* Obrázek je zapuštěný do skla: stín uvnitř u horní hrany. */
 .project-card__media::after {
   content: "";
   position: absolute;
   inset: 0;
+  border-radius: inherit;
   pointer-events: none;
   background: linear-gradient(180deg, transparent 55%, rgba(5, 11, 26, 0.55));
+  box-shadow: inset 0 12px 22px -14px rgba(0, 0, 0, 0.85), inset 0 0 0 1px rgba(255, 255, 255, 0.05);
 }
 
 .project-card__body {
@@ -1872,10 +2607,10 @@ section[id] {
 .project-card__year {
   flex-shrink: 0;
   margin-left: auto;
-  padding: 0.22rem 0.6rem;
+  padding: 0.24rem 0.62rem;
   border-radius: 999px;
-  border: 1px solid var(--line-strong);
-  background: rgba(4, 10, 24, 0.78);
+  background: linear-gradient(145deg, rgba(255, 255, 255, 0.08), rgba(255, 255, 255, 0.01)), rgba(4, 10, 24, 0.6);
+  box-shadow: -2px -2px 5px rgba(150, 190, 255, 0.07), 2px 3px 6px rgba(0, 3, 12, 0.65), inset 0 1px 0 rgba(255, 255, 255, 0.1);
   color: var(--text-muted);
   font-size: 0.7rem;
   font-weight: 700;
@@ -1928,7 +2663,9 @@ section[id] {
   gap: 0.75rem;
   margin-top: auto;
   padding-top: 1rem;
-  border-top: 1px solid var(--line);
+  /* Vyrytá drážka: tmavá linka a pod ní světlá. */
+  border-top: 1px solid rgba(0, 0, 0, 0.42);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.05);
 }
 
 .project-card__open,
@@ -1949,14 +2686,23 @@ section[id] {
   position: relative;
   z-index: 2;
   margin-left: auto;
-  padding: 0.3rem 0.7rem;
-  border: 1px solid color-mix(in srgb, var(--accent-a) 45%, transparent);
+  padding: 0.32rem 0.72rem;
   border-radius: 999px;
-  transition: background-color 250ms ease;
+  background-color: color-mix(in srgb, var(--accent-a) 10%, rgba(255, 255, 255, 0.03));
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.14),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.35),
+    0 0 0 1px color-mix(in srgb, var(--accent-a) 35%, transparent),
+    0 4px 10px -4px rgba(0, 0, 0, 0.75);
+  transition: background-color 250ms ease, box-shadow 200ms ease;
 }
 
 .project-card__web:hover {
-  background: color-mix(in srgb, var(--accent-a) 16%, transparent);
+  background-color: color-mix(in srgb, var(--accent-a) 20%, transparent);
+}
+
+.project-card__web:active {
+  box-shadow: var(--pressed), 0 0 0 1px color-mix(in srgb, var(--accent-a) 35%, transparent);
 }
 
 .project-card__open svg,
@@ -1991,6 +2737,7 @@ section[id] {
 }
 
 /* Herní HUD karta (inspirace karty zakladatelů na Streamally). */
+/* Herní HUD karta jako skleněná deska; na počítači se naklání za kurzorem (data-tilt na obalu). */
 .hud-card {
   --hud: 89, 168, 255;
   position: relative;
@@ -2001,16 +2748,60 @@ section[id] {
   padding: 1.4rem;
   overflow: hidden;
   border-radius: 22px;
-  border: 1px solid var(--line);
+  border: 1px solid rgba(255, 255, 255, 0.05);
   background:
+    var(--noise),
+    var(--glass-sheen),
     radial-gradient(480px 260px at 90% -10%, rgba(var(--hud), 0.16), transparent 62%),
     linear-gradient(200deg, #0d1a36, #070f22 60%);
+  box-shadow:
+    var(--glass-edges),
+    0 2px 0 rgba(12, 24, 54, 0.9),
+    0 3px 0 rgba(0, 0, 0, 0.45),
+    calc(var(--tx, 0) * -16px) calc(20px + var(--ty, 0) * -12px) 44px -18px rgba(0, 0, 0, 0.8),
+    0 4px 10px -2px rgba(0, 0, 0, 0.35);
+}
+
+.fx-3d .hud-card {
+  transform: perspective(1100px) rotateX(var(--rx, 0deg)) rotateY(var(--ry, 0deg));
+}
+
+.hud-card::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 5;
+  border-radius: inherit;
+  padding: 1px;
+  pointer-events: none;
+  background: linear-gradient(150deg, rgba(255, 255, 255, 0.4), rgba(255, 255, 255, 0.06) 24%, rgba(255, 255, 255, 0) 50%, rgba(var(--hud), 0.18) 80%, rgba(var(--hud), 0.5));
+  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+  mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  mask-composite: exclude;
+  opacity: 0.6;
+}
+
+.hud-card::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 4;
+  pointer-events: none;
+  opacity: 0;
+  background: radial-gradient(560px circle at var(--gx, 50%) var(--gy, 0%), rgba(255, 255, 255, 0.1), transparent 42%);
+  transition: opacity 350ms ease;
+}
+
+.hud-card:hover::after {
+  opacity: 1;
 }
 
 .hud-card--join {
   --hud: 155, 123, 255;
 }
 
+/* Rámeček s avatarem je zapuštěná obrazovka. */
 .hud-card__stage {
   position: relative;
   display: grid;
@@ -2019,8 +2810,16 @@ section[id] {
   aspect-ratio: 1;
   overflow: hidden;
   border-radius: 16px;
-  border: 1px solid var(--line-strong);
-  background: #061020;
+  background: #050d1c;
+  box-shadow:
+    inset 0 4px 12px rgba(0, 0, 0, 0.75),
+    inset 0 -1px 0 rgba(255, 255, 255, 0.06),
+    0 1px 0 rgba(255, 255, 255, 0.08),
+    0 0 0 1px rgba(0, 0, 0, 0.45);
+}
+
+.fx-3d .hud-card__stage {
+  translate: calc(var(--tx, 0) * -5px) calc(var(--ty, 0) * -5px);
 }
 
 .hud-card__glow {
@@ -2122,6 +2921,10 @@ section[id] {
   transform: translateY(-4px);
 }
 
+.fx-3d .hud-card__body {
+  translate: calc(var(--tx, 0) * 5px) calc(var(--ty, 0) * 5px);
+}
+
 .hud-card__role {
   color: rgb(var(--hud));
   font-size: 0.7rem;
@@ -2167,16 +2970,17 @@ section[id] {
   margin-top: 0.8rem;
 }
 
+/* Kulatá neumorfní tlačítka: vystouplá z karty, při najetí svítí, při kliknutí se vtlačí. */
 .icon-btn {
   display: inline-grid;
   place-items: center;
-  width: 2.5rem;
-  height: 2.5rem;
+  width: 2.6rem;
+  height: 2.6rem;
   border-radius: 999px;
-  border: 1px solid var(--line-strong);
-  background: rgba(255, 255, 255, 0.03);
+  background: linear-gradient(145deg, rgba(255, 255, 255, 0.08), rgba(255, 255, 255, 0.01));
+  box-shadow: var(--raised);
   color: var(--text-muted);
-  transition: color 250ms ease, border-color 250ms ease, background-color 250ms ease, transform 300ms var(--ease-out);
+  transition: color 250ms ease, background-color 250ms ease, box-shadow 250ms ease, transform 300ms var(--ease-spring);
 }
 
 .icon-btn svg {
@@ -2184,32 +2988,46 @@ section[id] {
   height: 1.15rem;
 }
 
-.icon-btn:hover,
-.icon-btn.is-copied {
+.icon-btn:hover {
   color: #ffffff;
-  border-color: rgba(89, 168, 255, 0.5);
-  background: rgba(89, 168, 255, 0.14);
   transform: translateY(-2px);
+  box-shadow: var(--raised), 0 0 18px -2px rgba(89, 168, 255, 0.55);
 }
 
+.icon-btn:active,
+.icon-btn.is-copied {
+  color: var(--cyan);
+  transform: none;
+  background-color: rgba(0, 4, 16, 0.3);
+  box-shadow: var(--pressed);
+}
+
+/* Čísla leží ve vtlačených jamkách vystouplé desky. */
 .stats {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(10rem, 1fr));
-  gap: 1px;
+  gap: 0.75rem;
   margin-top: 1.25rem;
-  overflow: hidden;
-  border-radius: 18px;
-  border: 1px solid var(--line);
-  background: var(--line);
+  padding: 0.75rem;
+  border-radius: 24px;
+  border: 1px solid rgba(255, 255, 255, 0.04);
+  background: var(--noise), linear-gradient(180deg, #0d1936, #091228);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.1),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.4),
+    -6px -6px 18px rgba(120, 160, 255, 0.05),
+    0 20px 40px -18px rgba(0, 0, 0, 0.8);
 }
 
 .stat {
   display: flex;
   flex-direction: column-reverse;
   justify-content: flex-end;
-  gap: 0.5rem;
-  padding: 1.3rem 1.5rem;
-  background: #071022;
+  gap: 0.6rem;
+  padding: 1.3rem 1.5rem 1.4rem;
+  border-radius: 17px;
+  background: linear-gradient(180deg, #060d20, #0a142e);
+  box-shadow: inset 4px 5px 12px rgba(0, 2, 10, 0.75), inset -3px -3px 9px rgba(120, 160, 255, 0.07);
 }
 
 .stat__value {
@@ -2217,10 +3035,12 @@ section[id] {
   font-weight: 900;
   font-size: clamp(2.4rem, 5vw, 3.4rem);
   line-height: 1;
-  background: linear-gradient(180deg, #ffffff, #7fb8ff);
-  -webkit-background-clip: text;
-  background-clip: text;
-  -webkit-text-fill-color: transparent;
+}
+
+.stat__value .voxel {
+  --vx-face: linear-gradient(180deg, #ffffff 0%, #e8f2ff 40%, #7fb8ff 100%);
+  --vx-x: 0.003em;
+  --vx-y: 0.011em;
 }
 
 .stat__label {
@@ -2249,27 +3069,49 @@ section[id] {
 .toolbox__list {
   display: flex;
   flex-wrap: wrap;
-  gap: 0.6rem;
+  gap: 0.75rem 0.65rem;
 }
 
+/* Toolbox jako herní klávesnice: tmavý sokl, na něm vypouklá čepička a pod klávesou RGB podsvícení,
+   které přes řadu přechází z tyrkysové do růžové. Najetí klávesu zmáčkne. */
 .tool-pill {
+  --hue: calc(188 + var(--i, 0) * 17);
   display: inline-flex;
-  align-items: center;
-  padding: 0.62rem 1.25rem;
-  border-radius: 999px;
-  border: 1.5px solid rgba(214, 231, 255, 0.45);
+  padding: 3px 4px 8px;
+  border-radius: 13px;
+  background: linear-gradient(180deg, #0f1d40, #070f25);
+  box-shadow:
+    0 0 0 1px hsl(var(--hue) 90% 60% / 0.28),
+    inset 0 1px 0 rgba(255, 255, 255, 0.07),
+    inset 0 -3px 6px -2px hsl(var(--hue) 95% 62% / 0.45),
+    0 12px 18px -8px rgba(0, 0, 0, 0.75),
+    0 4px 20px -4px hsl(var(--hue) 95% 62% / 0.42);
   color: var(--text);
   font-size: 0.92rem;
-  font-weight: 600;
+  font-weight: 700;
   opacity: 0;
   transform: translateY(14px) scale(0.85);
   transition:
     opacity 400ms ease,
     transform 550ms var(--ease-spring),
-    background-color 250ms ease,
-    border-color 250ms ease,
     box-shadow 300ms ease;
   transition-delay: calc(var(--i, 0) * 45ms + 150ms);
+}
+
+.tool-pill__cap {
+  display: block;
+  padding: 0.5rem 1.05rem 0.55rem;
+  border-radius: 10px;
+  background:
+    radial-gradient(120% 90% at 50% 0%, rgba(255, 255, 255, 0.13), transparent 60%),
+    linear-gradient(180deg, #223e7c, #172e61);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.24),
+    inset 0 -2px 3px rgba(0, 0, 0, 0.28),
+    0 1px 2px rgba(0, 0, 0, 0.45);
+  color: #eaf2ff;
+  text-shadow: 0 1px 1px rgba(0, 0, 0, 0.45);
+  transition: transform 160ms ease, box-shadow 160ms ease, color 200ms ease;
 }
 
 .reveal.is-visible .tool-pill {
@@ -2278,23 +3120,90 @@ section[id] {
 }
 
 .reveal.is-visible .tool-pill:hover {
-  border-color: var(--neon);
-  background: rgba(89, 168, 255, 0.14);
-  box-shadow: 0 8px 24px rgba(61, 109, 255, 0.25);
-  transform: translateY(-2px);
+  box-shadow:
+    0 0 0 1px hsl(var(--hue) 90% 65% / 0.55),
+    inset 0 1px 0 rgba(255, 255, 255, 0.07),
+    inset 0 -3px 8px -2px hsl(var(--hue) 95% 65% / 0.8),
+    0 10px 16px -8px rgba(0, 0, 0, 0.75),
+    0 4px 30px -2px hsl(var(--hue) 95% 62% / 0.7);
   transition-delay: 0ms;
+}
+
+.tool-pill:hover .tool-pill__cap {
+  transform: translateY(2px);
+  color: hsl(var(--hue) 100% 88%);
+}
+
+.tool-pill:active .tool-pill__cap {
+  transform: translateY(4px);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.16), inset 0 -1px 2px rgba(0, 0, 0, 0.3);
 }
 
 /* ══ CONTACT ════════════════════════════ */
 .contact {
-  padding-bottom: clamp(5rem, 9vw, 8.5rem);
+  padding-bottom: clamp(7rem, 12vw, 11rem);
   text-align: center;
 }
 
 .contact__inner {
+  position: relative;
   display: flex;
   flex-direction: column;
   align-items: center;
+}
+
+/* 3D podlaha: mřížka sklopená do perspektivy, která ubíhá k zářícímu obzoru a pomalu jede proti divákovi.
+   Rovina je kratší než vzdálenost oka (perspective / sin úhlu), jinak by se konec dostal za kameru. */
+/* Obzor leží těsně pod handlem, tlačítka stojí na podlaze. */
+.contact__floor {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: calc(clamp(7rem, 12vw, 11rem) + 8.5rem);
+  overflow: hidden;
+  pointer-events: none;
+  perspective: 420px;
+  perspective-origin: 50% 0;
+  -webkit-mask-image: linear-gradient(180deg, #000 0%, #000 62%, transparent 100%);
+  mask-image: linear-gradient(180deg, #000 0%, #000 62%, transparent 100%);
+}
+
+/* Zářící obzor: tenká světlá linka a nad ní i pod ní rozptýlené světlo. */
+.contact__floor::before {
+  content: "";
+  position: absolute;
+  inset: 0 0 auto;
+  z-index: 1;
+  height: 70px;
+  background:
+    linear-gradient(90deg, transparent 8%, rgba(160, 230, 255, 0.7) 50%, transparent 92%) 0 0 / 100% 1px no-repeat,
+    radial-gradient(45% 100% at 50% 0%, rgba(124, 236, 255, 0.28), transparent 75%);
+}
+
+.contact__plane {
+  position: absolute;
+  left: -15%;
+  right: -15%;
+  top: 0;
+  height: 410px;
+  overflow: hidden;
+  transform-origin: 50% 0;
+  transform: rotateX(78deg);
+  /* Mřížka se ke vzdálenému obzoru ztrácí (maska je v rovině podlahy, takže sleduje vzdálenost). */
+  -webkit-mask-image: linear-gradient(180deg, transparent 0%, #000 40%);
+  mask-image: linear-gradient(180deg, transparent 0%, #000 40%);
+}
+
+.contact__grid {
+  position: absolute;
+  inset: -56px 0 0;
+  background-image:
+    linear-gradient(rgba(89, 168, 255, 0.42) 1.5px, transparent 1.5px),
+    linear-gradient(90deg, rgba(124, 180, 255, 0.3) 1.5px, transparent 1.5px);
+  background-size: 56px 56px;
+  background-position: 50% 0;
+  animation: gridRun 2.6s linear infinite;
 }
 
 .contact__title .dim {
@@ -2330,28 +3239,48 @@ section[id] {
   color: #8fa2ff;
 }
 
+/* Handle z voxelů s duhovým čelem: po najetí se duha rozjede, při kliknutí se písmo zamáčkne. */
 .copy-handle__value {
   max-width: 100%;
-  padding: 0.1em 0.2em;
+  padding: 0.1em 0.2em 0.2em;
   overflow-wrap: anywhere;
   font-family: var(--font-display);
   font-weight: 900;
   font-size: clamp(2.1rem, 9vw, 5.6rem);
   line-height: 1.05;
   letter-spacing: 0.02em;
-  background-image: linear-gradient(90deg, #7cecff 0%, #59a8ff 20%, #9b7bff 40%, #f472b6 60%, #59a8ff 80%, #7cecff 100%);
-  background-size: 250% 100%;
-  -webkit-background-clip: text;
-  background-clip: text;
-  -webkit-text-fill-color: transparent;
-  animation: gradientPan 6s linear infinite paused;
   transition: transform 700ms var(--ease-out);
+}
+
+.copy-handle__value .voxel {
+  --vx-face: linear-gradient(90deg, #7cecff 0%, #59a8ff 20%, #9b7bff 40%, #f472b6 60%, #59a8ff 80%, #7cecff 100%);
+  --vx-s1: #3d4fc9;
+  --vx-s2: #30399f;
+  --vx-s3: #232a78;
+  --vx-s4: #171c52;
+  --vx-x: 0.0022em;
+  --vx-y: 0.0085em;
+  filter: drop-shadow(0 0 26px rgba(124, 130, 255, 0.28));
+}
+
+.copy-handle__value .voxel__face {
+  background-size: 250% 100%;
+  animation: gradientPan 6s linear infinite paused;
 }
 
 .copy-handle__value:hover,
 .copy-handle__value:focus-visible {
-  animation-play-state: running;
   transform: scale(1.03);
+}
+
+.copy-handle__value:hover .voxel__face,
+.copy-handle__value:focus-visible .voxel__face {
+  animation-play-state: running;
+}
+
+.copy-handle__value:active {
+  transform: scale(1.01) translateY(0.04em);
+  transition-duration: 120ms;
 }
 
 .copy-tooltip {
@@ -2359,10 +3288,10 @@ section[id] {
   top: 0;
   left: 50%;
   padding: 0.5rem 0.85rem;
-  border-radius: 9px;
-  border: 1px solid rgba(124, 236, 255, 0.35);
-  background: #16264f;
-  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.4);
+  border-radius: 10px;
+  border: 1px solid rgba(124, 236, 255, 0.3);
+  background: var(--glass-sheen), rgba(22, 38, 79, 0.82);
+  box-shadow: var(--glass-edges), 0 14px 30px -6px rgba(0, 0, 0, 0.6);
   color: #ffffff;
   font-size: 0.72rem;
   font-weight: 800;
@@ -2371,6 +3300,8 @@ section[id] {
   white-space: nowrap;
   opacity: 0;
   pointer-events: none;
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
   transform: translate(-50%, -110%) scale(0.92);
   transition: opacity 200ms ease, transform 300ms var(--ease-spring);
 }
@@ -2393,15 +3324,35 @@ section[id] {
   max-width: calc(var(--container) + 4rem);
   margin: 0 auto;
   padding: 3rem clamp(1.25rem, 4vw, 3rem) 1.5rem;
-  border: 1px solid var(--line);
+  border: 1px solid rgba(255, 255, 255, 0.05);
   border-bottom: 0;
   border-radius: 28px 28px 0 0;
   background:
-    radial-gradient(38% 9rem at 50% 0, rgba(255, 255, 255, 0.06), transparent),
-    rgba(8, 16, 36, 0.62);
-  box-shadow: 0 -14px 44px rgba(0, 0, 0, 0.35), inset 0 1px rgba(255, 255, 255, 0.06);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
+    var(--noise),
+    radial-gradient(38% 9rem at 50% 0, rgba(255, 255, 255, 0.07), transparent),
+    var(--glass-sheen),
+    rgba(8, 16, 36, 0.6);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.18),
+    inset 1px 0 0 rgba(255, 255, 255, 0.04),
+    0 -18px 50px -10px rgba(0, 0, 0, 0.55);
+  backdrop-filter: blur(18px) saturate(1.4);
+  -webkit-backdrop-filter: blur(18px) saturate(1.4);
+}
+
+.site-footer::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  padding: 1px 1px 0;
+  pointer-events: none;
+  background: var(--rim);
+  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+  mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  mask-composite: exclude;
+  opacity: 0.6;
 }
 
 .site-footer::before {
@@ -2426,6 +3377,8 @@ section[id] {
 .brand--lg .brand__mark {
   width: 38px;
   height: 38px;
+  border-radius: 11px;
+  box-shadow: 0 3px 0 #040a1c, 0 10px 18px -6px rgba(0, 0, 0, 0.7), 0 0 18px rgba(89, 168, 255, 0.3);
 }
 
 .brand--lg .brand__name {
@@ -2527,6 +3480,7 @@ section[id] {
   display: grid;
   place-items: center;
   padding: 1rem;
+  perspective: 1400px;
 }
 
 .warp-dialog-backdrop {
@@ -2547,11 +3501,23 @@ section[id] {
   max-height: calc(100vh - 2rem);
   max-height: calc(100dvh - 2rem);
   overflow-y: auto;
-  border-radius: 24px;
-  border: 1px solid rgba(116, 186, 255, 0.26);
-  background: linear-gradient(180deg, rgba(6, 15, 33, 0.97), rgba(7, 18, 40, 0.94));
-  box-shadow: 0 30px 100px rgba(0, 0, 0, 0.45);
-  animation: dialogPanelIn 260ms var(--ease-out) both;
+  border-radius: 26px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  /* Silné sklo; do scény se vyklopí zespodu jako deska na pantu. */
+  background:
+    var(--noise),
+    var(--glass-sheen),
+    linear-gradient(180deg, rgba(6, 15, 33, 0.86), rgba(7, 18, 40, 0.8));
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.24),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.45),
+    0 0 0 1px rgba(0, 0, 0, 0.3),
+    0 50px 120px -30px rgba(0, 0, 0, 0.85),
+    0 0 80px -20px rgba(89, 168, 255, 0.25);
+  backdrop-filter: blur(24px) saturate(1.5);
+  -webkit-backdrop-filter: blur(24px) saturate(1.5);
+  transform-origin: 50% 100%;
+  animation: dialogPanelIn 620ms var(--ease-out) both;
 }
 
 .warp-dialog-panel:focus {
@@ -2599,10 +3565,10 @@ section[id] {
   width: 38px;
   height: 38px;
   border-radius: 999px;
-  border: 1px solid rgba(89, 168, 255, 0.24);
-  background: rgba(8, 20, 46, 0.7);
+  background: linear-gradient(145deg, rgba(255, 255, 255, 0.09), rgba(255, 255, 255, 0.01));
+  box-shadow: var(--raised);
   color: #dbeeff;
-  transition: border-color 200ms ease, color 200ms ease;
+  transition: box-shadow 200ms ease, color 200ms ease, transform 300ms var(--ease-spring);
 }
 
 .warp-dialog-close svg {
@@ -2611,8 +3577,12 @@ section[id] {
 }
 
 .warp-dialog-close:hover {
-  border-color: rgba(89, 168, 255, 0.5);
   color: #ffffff;
+  transform: rotate(90deg);
+}
+
+.warp-dialog-close:active {
+  box-shadow: var(--pressed);
 }
 
 .warp-contact-grid {
@@ -2620,6 +3590,14 @@ section[id] {
   grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 0.85rem;
   margin-top: 1.5rem;
+}
+
+/* Kontakty jako vystouplé skleněné dlaždice; s myší se naklánějí (data-tilt na li). Zvednutí (--lift) má
+   vlastní plynulý přechod, náklon řídí pružina v JS. */
+@property --lift {
+  syntax: "<length>";
+  inherits: false;
+  initial-value: 0px;
 }
 
 .warp-contact-link {
@@ -2630,33 +3608,54 @@ section[id] {
   width: 100%;
   padding: 1rem 1.1rem;
   border-radius: 16px;
-  border: 1px solid rgba(89, 168, 255, 0.18);
-  background: rgba(8, 20, 46, 0.65);
+  background: linear-gradient(160deg, rgba(255, 255, 255, 0.07), rgba(255, 255, 255, 0.015) 50%), rgba(8, 20, 46, 0.6);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.14),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.4),
+    0 0 0 1px rgba(89, 168, 255, 0.12),
+    calc(var(--tx, 0) * -8px) calc(10px + var(--ty, 0) * -6px) 22px -12px rgba(0, 0, 0, 0.8);
   text-align: left;
-  transition: border-color 160ms ease, transform 200ms var(--ease-out), background-color 160ms ease;
+  transform: perspective(700px) rotateX(var(--rx, 0deg)) rotateY(var(--ry, 0deg)) translateY(var(--lift));
+  transition: background-color 160ms ease, --lift 300ms var(--ease-spring);
 }
 
 .warp-contact-link:hover,
 .warp-contact-link.is-copied {
-  transform: translateY(-2px);
-  border-color: rgba(89, 168, 255, 0.45);
-  background: rgba(11, 28, 60, 0.82);
+  --lift: -2px;
+  background-color: rgba(11, 28, 60, 0.8);
 }
 
+.warp-contact-link:active {
+  --lift: 1px;
+}
+
+/* Ikona jako lesklá 3D dlaždice aplikace v barvách sítě. */
 .warp-contact-icon {
+  --tile: linear-gradient(160deg, #6fb0ff, #3d6dff 60%, #2b4fd0);
   display: grid;
   place-items: center;
   flex: 0 0 44px;
   width: 44px;
   height: 44px;
   border-radius: 13px;
-  background: rgba(89, 168, 255, 0.12);
-  color: #eaf7ff;
+  background: radial-gradient(90% 60% at 50% 0%, rgba(255, 255, 255, 0.4), rgba(255, 255, 255, 0) 70%), var(--tile);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.45),
+    inset 0 -3px 6px rgba(0, 0, 0, 0.3),
+    0 2px 0 rgba(0, 0, 0, 0.35),
+    0 8px 16px -6px rgba(0, 0, 0, 0.75);
+  color: #ffffff;
 }
+
+.warp-contact-icon--discord { --tile: linear-gradient(160deg, #8c96ff, #5865f2 55%, #4450d6); }
+.warp-contact-icon--github { --tile: linear-gradient(160deg, #6b7686, #2b313b 55%, #1a1f27); }
+.warp-contact-icon--instagram { --tile: linear-gradient(160deg, #ffd776 0%, #f56040 32%, #e1306c 58%, #833ab4 90%); }
+.warp-contact-icon--steam { --tile: linear-gradient(160deg, #4a90c8, #1b4f86 50%, #0f2a4a); }
 
 .warp-contact-icon svg {
   width: 24px;
   height: 24px;
+  filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.35));
 }
 
 .warp-contact-text {
@@ -2807,7 +3806,7 @@ section[id] {
   border-radius: 10px;
   border: 1px solid rgba(124, 236, 255, 0.35);
   background: #16264f;
-  box-shadow: 0 10px 24px rgba(0, 0, 0, 0.4);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.2), inset 0 -1px 0 rgba(0, 0, 0, 0.35), 0 12px 24px -6px rgba(0, 0, 0, 0.55);
   color: #ffffff;
   font-size: 0.72rem;
   font-weight: 800;
@@ -2906,6 +3905,7 @@ section[id] {
   animation-delay: 1200ms;
 }
 
+/* Kulaté neumorfní přepínače: vystouplé, zapnutá kočka je vtlačená a svítí. */
 .cat-toggle,
 .lang-toggle {
   display: inline-grid;
@@ -2914,10 +3914,10 @@ section[id] {
   height: 40px;
   flex-shrink: 0;
   border-radius: 999px;
-  border: 1px solid var(--line-strong);
-  background: rgba(255, 255, 255, 0.04);
+  background: linear-gradient(145deg, rgba(255, 255, 255, 0.08), rgba(255, 255, 255, 0.01));
+  box-shadow: var(--raised);
   color: var(--text-dim);
-  transition: color 250ms ease, border-color 250ms ease, background-color 250ms ease, transform 300ms var(--ease-out);
+  transition: color 250ms ease, background-color 250ms ease, box-shadow 250ms ease, transform 300ms var(--ease-spring);
 }
 
 .cat-toggle svg,
@@ -2932,6 +3932,12 @@ section[id] {
   transform: translateY(-1px);
 }
 
+.cat-toggle:active,
+.lang-toggle:active {
+  transform: none;
+  box-shadow: var(--pressed);
+}
+
 .lang-toggle {
   font-size: 0.7rem;
   font-weight: 800;
@@ -2940,8 +3946,13 @@ section[id] {
 
 .cat-toggle[aria-pressed="true"] {
   color: var(--cyan);
-  border-color: rgba(124, 236, 255, 0.45);
-  background: rgba(124, 236, 255, 0.1);
+  background-color: rgba(0, 6, 20, 0.35);
+  box-shadow: var(--pressed), 0 0 0 1px rgba(124, 236, 255, 0.18);
+  text-shadow: 0 0 10px rgba(124, 236, 255, 0.8);
+}
+
+.cat-toggle[aria-pressed="true"] svg {
+  filter: drop-shadow(0 0 6px rgba(124, 236, 255, 0.7));
 }
 
 .cat-toggle--wide,
@@ -2957,21 +3968,27 @@ section[id] {
 
 /* ══ LOW-END DEVICE OVERRIDES ═══════════ */
 .low-end .site-nav__inner,
+.low-end .hero-tag__glass,
 .low-end .mobile-menu,
 .low-end .hero__status,
-.low-end .hero-tag > span,
 .low-end .site-footer,
+.low-end .btn-ghost,
+.low-end .copy-tooltip,
 .low-end .warp-dialog-backdrop {
   backdrop-filter: none;
   -webkit-backdrop-filter: none;
 }
 
 .low-end .site-nav__inner {
-  background: rgba(6, 13, 30, 0.94);
+  --nav-tint: rgba(6, 13, 30, 0.94);
 }
 
 .low-end .site-footer {
-  background: #081024;
+  background: var(--glass-sheen), #081024;
+}
+
+.low-end .hero-tag__glass {
+  background: rgba(22, 44, 100, 0.85);
 }
 
 .low-end .reveal > *,
@@ -2980,6 +3997,13 @@ section[id] {
   opacity: 1;
   transform: none;
   transition: none;
+  animation: none;
+}
+
+/* Kostka v preloaderu a mřížka u kontaktu stojí. */
+.low-end .cube3d,
+.low-end .contact__grid {
+  animation: none;
 }
 
 .low-end .hero__inner > * {
@@ -2994,7 +4018,7 @@ section[id] {
   transform: rotate(var(--rot, 0deg));
 }
 
-.low-end .hero-tag > span,
+.low-end .hero-tag__glass,
 .low-end .hero__caret,
 .low-end .hud-card__scan::after,
 .low-end .scroll-progress,
@@ -3106,11 +4130,37 @@ section[id] {
 @keyframes dialogPanelIn {
   from {
     opacity: 0;
-    transform: translateY(14px) scale(0.98);
+    transform: translateY(46px) rotateX(18deg) scale(0.94);
   }
   to {
     opacity: 1;
     transform: none;
+  }
+}
+
+@keyframes rise3d {
+  from {
+    opacity: 0;
+    transform: perspective(1100px) translateY(2.6rem) rotateX(24deg);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes cubeSpin {
+  from {
+    transform: rotateX(-22deg) rotateY(0deg);
+  }
+  to {
+    transform: rotateX(-22deg) rotateY(360deg);
+  }
+}
+
+@keyframes gridRun {
+  to {
+    transform: translateY(56px);
   }
 }
 
@@ -3164,12 +4214,11 @@ section[id] {
     margin-top: -9svh;
   }
 
-  .showcase__card {
-    transform: rotateX(calc((1 - var(--p)) * 16deg)) scale(calc(0.95 + var(--p) * 0.05));
-  }
-
-  .showcase__bar {
-    font-size: 0.7rem;
+  /* Na mobilu se víko otvírá z menšího úhlu, ať je displej se hrou čitelný hned. */
+  .laptop {
+    --lid: calc(-90deg + var(--p) * 96deg);
+    --view: calc(-24deg + var(--p) * 20deg);
+    --zoom: calc(0.92 + var(--p) * 0.08);
   }
 
   .warp-dialog-body {
@@ -3255,6 +4304,13 @@ section[id] {
     opacity: 1;
     transform: none;
     transition: none;
+    animation: none;
+  }
+
+  .cube3d,
+  .contact__grid,
+  .copy-handle__value .voxel__face {
+    animation: none;
   }
 
   .hero__inner > *,
@@ -3271,7 +4327,7 @@ section[id] {
     transform: rotate(var(--rot, 0deg));
   }
 
-  .hero-tag > span,
+  .hero-tag > .hero-tag__glass,
   .hero__caret,
   .hud-card__scan::after,
   .scroll-progress,

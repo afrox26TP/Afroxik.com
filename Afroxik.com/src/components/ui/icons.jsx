@@ -158,6 +158,51 @@ export function IconExpand(props) {
   );
 }
 
+// Ovládání okna a ikonky v liště ve stylu Windows 11 (showcase notebook).
+export function IconMinimize(props) {
+  return (
+    <Stroke {...props}>
+      <path d="M5 12h14" />
+    </Stroke>
+  );
+}
+
+export function IconMaximize(props) {
+  return (
+    <Stroke {...props}>
+      <rect x="5" y="5" width="14" height="14" rx="1.5" />
+    </Stroke>
+  );
+}
+
+export function IconWifi(props) {
+  return (
+    <Stroke {...props}>
+      <path d="M2.5 9a14 14 0 0 1 19 0M5.5 12.5a9.5 9.5 0 0 1 13 0M8.6 15.8a5 5 0 0 1 6.8 0" />
+      <path d="M12 19.2h.01" />
+    </Stroke>
+  );
+}
+
+export function IconVolume(props) {
+  return (
+    <Stroke {...props}>
+      <path d="M11 5 6 9H3v6h3l5 4V5Z" />
+      <path d="M15.5 9.5a3.5 3.5 0 0 1 0 5M18.5 7a7 7 0 0 1 0 10" />
+    </Stroke>
+  );
+}
+
+export function IconBattery(props) {
+  return (
+    <Stroke {...props}>
+      <rect x="2.5" y="7" width="17" height="10" rx="2" />
+      <path d="M22 11v2" />
+      <path d="M5.5 10v4M8.5 10v4M11.5 10v4" />
+    </Stroke>
+  );
+}
+
 export function IconGamepad(props) {
   return (
     <Stroke {...props}>

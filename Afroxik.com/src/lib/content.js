@@ -38,6 +38,9 @@ const homepages = {
 const featured = {
   repo: "RP-2025-26",
   play: "/play/",
+  // Název a ikona aplikace v okně a hlavním panelu „Windows“ na displeji notebooku (ikonu exportuje Godot).
+  app: "European Sidequest",
+  icon: "/play/index.icon.png",
   src: "/images/rp-2025-26.webp",
   srcSet: "/images/rp-2025-26-720.webp 720w, /images/project-screenshot.webp 1200w, /images/rp-2025-26.webp 1800w",
   width: 1800,

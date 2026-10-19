@@ -1,9 +1,12 @@
 import Reveal from "../ui/Reveal";
+import MetalLayer from "../ui/MetalLayer";
+import VoxelText from "../ui/VoxelText";
 import { IconArrowUpRight, IconDiscord, IconGithub } from "../ui/icons";
 import { useT } from "../../lib/i18n";
 
 // Velký Discord handle, který se po kliknutí zkopíruje (inspirace e-mailem na Lepshee).
-export default function Contact({ socials, copiedKey, onCopy, onContact }) {
+// Pod ním 3D mřížková podlaha, která ubíhá k obzoru.
+export default function Contact({ socials, copiedKey, onCopy, onContact, lowMotion }) {
   const t = useT();
   const discord = socials.find((social) => social.id === "discord");
   const github = socials.find((social) => social.id === "github");
@@ -11,6 +14,12 @@ export default function Contact({ socials, copiedKey, onCopy, onContact }) {
 
   return (
     <section className="section section--hairline contact" id="contact" aria-labelledby="contact-title">
+      <div className="contact__floor" aria-hidden="true">
+        <div className="contact__plane">
+          <div className="contact__grid" />
+        </div>
+      </div>
+
       <div className="section__shell">
         <Reveal className="contact__inner">
           <span className="kicker">{t.sections.contact}</span>
@@ -29,7 +38,7 @@ export default function Contact({ socials, copiedKey, onCopy, onContact }) {
                 onClick={() => onCopy(discord.copy, "contact-discord")}
                 aria-label={`${t.contact.copyDiscord}: ${discord.handle}`}
               >
-                {discord.handle}
+                <VoxelText>{discord.handle}</VoxelText>
               </button>
               <span className="copy-tooltip" role="status">
                 {copied ? t.copied : ""}
@@ -38,8 +47,9 @@ export default function Contact({ socials, copiedKey, onCopy, onContact }) {
           )}
 
           <div className="contact__actions">
-            <button type="button" className="btn-colorful" onClick={onContact}>
-              {t.allContacts}
+            <button type="button" className="nav-cta nav-cta--lg metal-btn" onClick={onContact}>
+              <MetalLayer still={lowMotion} />
+              <span className="metal-btn__core">{t.allContacts}</span>
             </button>
             {github && (
               <a className="btn-ghost" href={github.href} target="_blank" rel="noreferrer">

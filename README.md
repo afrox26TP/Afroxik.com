@@ -56,9 +56,14 @@ node Afroxik.com/scripts/import-game.mjs "C:/cesta/k/exportu" "European Sideques
 
 Skript složku `Afroxik.com/public/play/` vyprázdní, zabalí oba velké soubory, zkopíruje zbytek, vloží rozbalovací skript
 a nastaví titulek. Zabalené soubory mají v adrese verzi (`?v=`), takže se nikdy nesejdou se starou verzí z cache.
-Showcase bere adresu z `featured.play` v `content.js`. Na počítači se hra po kliknutí na ▶ spustí přímo v „okně
-prohlížeče“ místo screenshotu (iframe, tlačítka Celá obrazovka a Zavřít v liště), po dobu hraní jsou vypnuté efekty
-pozadí. Na mobilu a dotykových zařízeních se otevře zvlášť v nové záložce.
+Showcase bere adresu z `featured.play` v `content.js` (název a ikonu okna z `featured.app` a `featured.icon`). Displej
+3D notebooku je plocha Windows 11: maximalizované okno se screenshotem a dole hlavní panel se Startem, ikonou hry
+a GitHubem (odkaz na repo projektu) a skutečným časem. Na počítači se hra po kliknutí na ▶ spustí přímo v okně místo
+screenshotu (iframe); v titulku okna je — (minimalizuje okno do panelu), ☐ (celá obrazovka, když hra neběží, rovnou
+ji spustí) a ✕ (zavře hru, jinak zavře okno na plochu se zástupcem). Notebook se při hraní srovná čelem k divákovi
+a po dobu hraní jsou vypnuté efekty pozadí. Na mobilu a dotykových zařízeních se otevře
+zvlášť v nové záložce. Lokální `npm run dev` by na `/play/` vrátil web místo hry, proto ho `vite.config.js`
+(`servePlayIndex`) přepíše na `/play/index.html`; v produkci to Cloudflare dělá sám.
 
 ## Kočka „Dam dam didi didi“
 
@@ -82,11 +87,39 @@ Zvuk `Afroxik.com/public/media/damdam.m4a` je původní stopa (`videoplayback.m4
 
 ## Tekutý kov a sklo
 
-- Tlačítka v úvodu, HRÁT a NAPIŠ MI mají rám z tekutého kovu: pod tlačítkem běží malé WebGL plátno
+- Tlačítka v úvodu, HRÁT, NAPIŠ MI a VŠECHNY KONTAKTY mají rám z tekutého kovu: pod tlačítkem běží malé WebGL plátno
   (`Afroxik.com/src/components/ui/MetalLayer.jsx`), tmavý panel ho zakryje všude kromě rámu a štítku.
   Shader je převzatý z knihovny [Argent](https://github.com/seangeng/argent) (MIT, licence je v hlavičce
   `Afroxik.com/src/lib/liquidMetal.js`). Kov teče jen když je vidět; na slabém zařízení je místo něj CSS gradient.
 - Spustit hru v showcase je čiré sklo; v Chromu se pozadí na okrajích láme (`Afroxik.com/src/lib/liquidRefraction.js`).
+
+## 3D vzhled
+
+Celé UI je postavené z „hmotných“ materiálů, světlo svítí vždy zleva shora. Tokeny (`--glass-sheen`, `--rim`, `--raised`,
+`--pressed`, `--depth-*`, `--noise`) jsou na začátku `Afroxik.com/src/index.css`.
+
+- **Sklo** – navigace, karty, patička a dialog jsou matné sklo se zrnem, světlým okrajem a tmavší spodní hranou.
+- **Neumorfismus** – přepínače, kulatá tlačítka, štítky a jamky se statistikami jsou z povrchu vystouplé nebo vtlačené.
+- **Voxelové písmo** – nadpisy z písma Doto mají hloubku z vrstvených stínů. Barevné čelo (AFROX, statistiky, Discord
+  handle) kreslí `Afroxik.com/src/components/ui/VoxelText.jsx`: kopie textu pod čelem dělá hloubku a čtečky ji přeskočí.
+- **3D scéna v úvodu** – nadpis se štítky se natáčí za kurzorem a hloubka písmen se otáčí podle úhlu pohledu.
+- **3D objekty kolem nadpisu (zatím vypnuté)** – `Afroxik.com/src/components/sections/HeroScene.jsx` s vlastním
+  `HeroScene.css`: křišťálová koule s točícím se tečkovaným globusem, koule z tekutého kovu (MetalLayer s tónem
+  `sphere` – shader počítá odraz na kouli), gyroskop ze tří prstenců a skleněná kostka. Zapnou se importem v `Hero.jsx`
+  a `<HeroScene lowMotion={lowMotion} />` jako prvním potomkem sekce; dokud tam nejsou, nejdou ani do buildu.
+- **Náklon karet** – projekty, HUD karty, monitor se hrou a kontakty v dialogu se naklánějí za kurzorem a na pružině se
+  vracejí. Stačí prvku dát `data-tilt="<max. stupňů>"`; `Afroxik.com/src/lib/pointer3d.js` mu zapisuje `--rx/--ry`
+  (úhly), `--tx/--ty` (posun stínu a obsahu) a `--gx/--gy` (odlesk) a CSS je použije na potomka. Paralaxu úvodu řídí
+  `data-parallax` (`--px/--py`).
+- **Notebook se hrou** – showcase je 3D notebook (`Showcase.jsx`, třídy `.laptop*`): víko s rámečkem a kamerou, zadní
+  kryt se svítícím logem, spodní díl s bíle podsvícenou klávesnicí a touchpadem. Na začátku je zavřený; jakmile se
+  celý vynoří, scrollováním se víko otevře (`--p`, rozsah `OPEN_START`/`OPEN_END` v `Showcase.jsx`) a pohled sjede
+  níž, za kurzorem se notebook lehce natočí. S omezenými animacemi nebo v režimu Low je rovnou otevřený. Klikat jde
+  jen na displej: vlastní roviny notebooku a víka by v 3D scéně ležely před zakloněným displejem a chytaly kliky.
+- Toolbox je herní klávesnice s RGB podsvícením, pod kontaktem ubíhá 3D mřížka k obzoru.
+
+Náklon a paralaxa běží jen s myší, při plných efektech a bez omezených animací (třída `fx-3d`). Na mobilu, v režimu
+`Low` a s `prefers-reduced-motion` zůstávají materiály, ale nic se nehýbe za kurzorem a objekty stojí.
 
 ## Výkon
 
